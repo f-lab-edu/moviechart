@@ -39,6 +39,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -138,14 +140,27 @@ private fun MovieList() {
         contentPadding = PaddingValues(horizontal = 50.dp)
     ) {
         items(DummyMovieData.movies) { movie ->
-            Box(
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(450.dp)
-                    .clip(RoundedCornerShape(10.dp))
-            ) {
-                MoviePoster(posterUrl = movie.posterUrl)
-                MovieRank(rank = movie.rank)
+            val posterWidth = 300.dp
+            Column {
+                Box(
+                    modifier = Modifier
+                        .width(posterWidth)
+                        .height(450.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                ) {
+                    MoviePoster(posterUrl = movie.posterUrl)
+                    MovieRank(rank = movie.rank)
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+                Text(
+                    text = movie.title,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.width(posterWidth)
+                )
             }
         }
     }
