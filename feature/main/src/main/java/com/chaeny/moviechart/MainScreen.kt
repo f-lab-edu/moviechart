@@ -40,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.annotation.StringRes
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
@@ -113,12 +114,7 @@ private fun TabItem(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(
-                when (tabType) {
-                    TabType.DAILY -> R.string.daily
-                    TabType.WEEKLY -> R.string.weekly
-                }
-            ),
+            text = stringResource(tabType.tabResId),
             fontSize = 16.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
         )
@@ -175,7 +171,7 @@ private object DummyMovieData {
     )
 }
 
-private enum class TabType {
-    DAILY,
-    WEEKLY
+private enum class TabType(@StringRes val tabResId: Int) {
+    DAILY(R.string.daily),
+    WEEKLY(R.string.weekly)
 }
