@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -137,7 +138,12 @@ private fun MovieList() {
         contentPadding = PaddingValues(horizontal = 50.dp)
     ) {
         items(DummyMovieData.movies) { movie ->
-            Box {
+            Box(
+                modifier = Modifier
+                    .width(300.dp)
+                    .height(450.dp)
+                    .clip(RoundedCornerShape(10.dp))
+            ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(movie.posterUrl)
@@ -147,10 +153,21 @@ private fun MovieList() {
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(R.drawable.loading_img),
                     error = painterResource(R.drawable.ic_broken_image),
+                    modifier = Modifier.fillMaxSize()
+                )
+                Box(
                     modifier = Modifier
-                        .width(300.dp)
-                        .height(450.dp)
-                        .clip(RoundedCornerShape(10.dp))
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    Color.Black.copy(alpha = 0.7f)
+                                )
+                            )
+                        )
                 )
                 Text(
                     text = "${movie.rank}",
