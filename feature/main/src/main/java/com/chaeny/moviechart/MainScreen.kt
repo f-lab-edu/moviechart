@@ -161,8 +161,29 @@ private fun MovieList() {
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.width(posterWidth)
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(
+                        R.string.movie_info,
+                        "${movie.salesShare}%",
+                        formatAudiAcc(movie.audiAcc)
+                    ),
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center,
+                    color = Color.Gray,
+                    modifier = Modifier.width(posterWidth)
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun formatAudiAcc(audiAcc: Int): String {
+    return if (audiAcc >= 10000) {
+        stringResource(R.string.audience_acc, audiAcc / 10000)
+    } else {
+        "$audiAcc"
     }
 }
 
