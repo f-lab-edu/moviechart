@@ -40,7 +40,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.annotation.StringRes
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
@@ -137,10 +136,10 @@ private fun MovieList() {
         horizontalArrangement = Arrangement.spacedBy(30.dp),
         contentPadding = PaddingValues(horizontal = 50.dp)
     ) {
-        items(DummyMovieData.posterUrls) { imageUrl ->
+        items(DummyMovieData.movies) { movie ->
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(imageUrl)
+                    .data(movie.posterUrl)
                     .crossfade(true)
                     .build(),
                 contentDescription = stringResource(R.string.movie_poster),
@@ -154,24 +153,4 @@ private fun MovieList() {
             )
         }
     }
-}
-
-private object DummyMovieData {
-    val posterUrls = listOf(
-        "https://image.tmdb.org/t/p/w500/pf7vZxoLYtLQ366VNlGrjBxwL7A.jpg",
-        "https://image.tmdb.org/t/p/w500/Amu0HNWfpxo2ZaulueNVxDLADz8.jpg",
-        "https://image.tmdb.org/t/p/w500/m6Dho6hDCcL5KI8mOQNemZAedFI.jpg",
-        "https://image.tmdb.org/t/p/w500/9RsHtbUMXMfHjkL74BhM7KFEozT.jpg",
-        "https://image.tmdb.org/t/p/w500/cwvehMf8bnWwUhKOFR6qHTxg1VO.jpg",
-        "https://image.tmdb.org/t/p/w500/gEVSN7rzQsypG4YfYObsPmMtYpP.jpg",
-        "https://image.tmdb.org/t/p/w500/bvVoP1t2gNvmE9ccSrqR1zcGHGM.jpg",
-        "https://image.tmdb.org/t/p/w500/eSNprN73xK9LKN8f5y5Ee446QzK.jpg",
-        "https://image.tmdb.org/t/p/w500/kI9ffyOEwj0bdpttdPEtAVDFHxC.jpg",
-        "https://image.tmdb.org/t/p/w500/rXyniH1Xyp3xksHzZ0wSU6IqDjh.jpg"
-    )
-}
-
-private enum class TabType(@StringRes val tabResId: Int) {
-    DAILY(R.string.daily),
-    WEEKLY(R.string.weekly)
 }
