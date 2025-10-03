@@ -2,4 +2,6 @@
 <resources>
     <string name="movie">MOVIE</string>
     <string name="search">Search</string>
+    <string name="daily">일간</string>
+    <string name="weekly">주간</string>
 </resources>

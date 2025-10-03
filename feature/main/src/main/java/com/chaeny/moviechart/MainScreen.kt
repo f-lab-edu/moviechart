@@ -1,11 +1,13 @@
 package com.chaeny.moviechart
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -20,10 +22,11 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun MainScreen() {
-    Box(
+    Column(
         modifier = Modifier.fillMaxSize()
     ) {
         TopBar()
+        PeriodTabs()
     }
 }
 
@@ -47,5 +50,18 @@ private fun TopBar() {
                 contentDescription = stringResource(R.string.search)
             )
         }
+    }
+}
+
+@Composable
+private fun PeriodTabs() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 25.dp, vertical = 8.dp)
+    ) {
+        Text(text = stringResource(R.string.daily), fontSize = 16.sp)
+        Spacer(modifier = Modifier.width(20.dp))
+        Text(text = stringResource(R.string.weekly), fontSize = 16.sp)
     }
 }
