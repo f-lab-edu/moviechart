@@ -72,41 +72,43 @@ private fun PeriodTabs() {
             .fillMaxWidth()
             .padding(horizontal = 25.dp, vertical = 8.dp)
     ) {
-        Column(
-            modifier = Modifier.clickable { selectedTab = TabType.DAILY },
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = stringResource(R.string.daily),
-                fontSize = 16.sp,
-                fontWeight = if (selectedTab == TabType.DAILY) FontWeight.Bold else FontWeight.Normal
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Box(
-                modifier = Modifier
-                    .width(40.dp)
-                    .height(2.dp)
-                    .background(if (selectedTab == TabType.DAILY) Color.Black else Color.Transparent)
-            )
-        }
+        TabItem(
+            text = stringResource(R.string.daily),
+            isSelected = selectedTab == TabType.DAILY,
+            onClick = { selectedTab = TabType.DAILY }
+        )
         Spacer(modifier = Modifier.width(20.dp))
-        Column(
-            modifier = Modifier.clickable { selectedTab = TabType.WEEKLY },
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = stringResource(R.string.weekly),
-                fontSize = 16.sp,
-                fontWeight = if (selectedTab == TabType.WEEKLY) FontWeight.Bold else FontWeight.Normal
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Box(
-                modifier = Modifier
-                    .width(40.dp)
-                    .height(2.dp)
-                    .background(if (selectedTab == TabType.WEEKLY) Color.Black else Color.Transparent)
-            )
-        }
+        TabItem(
+            text = stringResource(R.string.weekly),
+            isSelected = selectedTab == TabType.WEEKLY,
+            onClick = { selectedTab = TabType.WEEKLY }
+        )
+    }
+}
+
+@Composable
+private fun TabItem(
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.clickable(onClick = onClick),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = text,
+            fontSize = 16.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Box(
+            modifier = Modifier
+                .width(40.dp)
+                .height(2.dp)
+                .background(if (isSelected) Color.Black else Color.Transparent)
+        )
     }
 }
 
