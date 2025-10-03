@@ -84,25 +84,22 @@ private fun PeriodTabs() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 25.dp, vertical = 8.dp)
+            .padding(horizontal = 25.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        TabItem(
-            text = stringResource(R.string.daily),
-            isSelected = selectedTab == TabType.DAILY,
-            onClick = { selectedTab = TabType.DAILY }
-        )
-        Spacer(modifier = Modifier.width(20.dp))
-        TabItem(
-            text = stringResource(R.string.weekly),
-            isSelected = selectedTab == TabType.WEEKLY,
-            onClick = { selectedTab = TabType.WEEKLY }
-        )
+        TabType.entries.forEach { tab ->
+            TabItem(
+                tabType = tab,
+                isSelected = selectedTab == tab,
+                onClick = { selectedTab = tab }
+            )
+        }
     }
 }
 
 @Composable
 private fun TabItem(
-    text: String,
+    tabType: TabType,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -116,7 +113,12 @@ private fun TabItem(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = text,
+            text = stringResource(
+                when (tabType) {
+                    TabType.DAILY -> R.string.daily
+                    TabType.WEEKLY -> R.string.weekly
+                }
+            ),
             fontSize = 16.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
         )
