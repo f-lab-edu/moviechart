@@ -3,8 +3,10 @@ package com.chaeny.moviechart
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -26,11 +31,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 
 @Composable
 fun MainScreen() {
@@ -39,6 +47,7 @@ fun MainScreen() {
     ) {
         TopBar()
         PeriodTabs()
+        MovieList()
     }
 }
 
@@ -116,6 +125,44 @@ private fun TabItem(
                 .background(if (isSelected) Color.Black else Color.Transparent)
         )
     }
+}
+
+@Composable
+private fun MovieList() {
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 20.dp),
+        horizontalArrangement = Arrangement.spacedBy(30.dp),
+        contentPadding = PaddingValues(horizontal = 50.dp)
+    ) {
+        items(DummyMovieData.posterUrls) { imageUrl ->
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = stringResource(R.string.movie_poster),
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .width(300.dp)
+                    .height(450.dp)
+                    .clip(RoundedCornerShape(10.dp))
+            )
+        }
+    }
+}
+
+private object DummyMovieData {
+    val posterUrls = listOf(
+        "https://image.tmdb.org/t/p/w500/pf7vZxoLYtLQ366VNlGrjBxwL7A.jpg",
+        "https://image.tmdb.org/t/p/w500/Amu0HNWfpxo2ZaulueNVxDLADz8.jpg",
+        "https://image.tmdb.org/t/p/w500/m6Dho6hDCcL5KI8mOQNemZAedFI.jpg",
+        "https://image.tmdb.org/t/p/w500/9RsHtbUMXMfHjkL74BhM7KFEozT.jpg",
+        "https://image.tmdb.org/t/p/w500/cwvehMf8bnWwUhKOFR6qHTxg1VO.jpg",
+        "https://image.tmdb.org/t/p/w500/gEVSN7rzQsypG4YfYObsPmMtYpP.jpg",
+        "https://image.tmdb.org/t/p/w500/bvVoP1t2gNvmE9ccSrqR1zcGHGM.jpg",
+        "https://image.tmdb.org/t/p/w500/eSNprN73xK9LKN8f5y5Ee446QzK.jpg",
+        "https://image.tmdb.org/t/p/w500/kI9ffyOEwj0bdpttdPEtAVDFHxC.jpg",
+        "https://image.tmdb.org/t/p/w500/rXyniH1Xyp3xksHzZ0wSU6IqDjh.jpg"
+    )
 }
 
 private enum class TabType {
