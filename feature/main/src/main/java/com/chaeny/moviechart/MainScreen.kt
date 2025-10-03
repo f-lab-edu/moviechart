@@ -137,20 +137,31 @@ private fun MovieList() {
         contentPadding = PaddingValues(horizontal = 50.dp)
     ) {
         items(DummyMovieData.movies) { movie ->
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(movie.posterUrl)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = stringResource(R.string.movie_poster),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(R.drawable.loading_img),
-                error = painterResource(R.drawable.ic_broken_image),
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(450.dp)
-                    .clip(RoundedCornerShape(10.dp))
-            )
+            Box {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(movie.posterUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = stringResource(R.string.movie_poster),
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(R.drawable.loading_img),
+                    error = painterResource(R.drawable.ic_broken_image),
+                    modifier = Modifier
+                        .width(300.dp)
+                        .height(450.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                )
+                Text(
+                    text = "${movie.rank}",
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(20.dp),
+                    fontSize = 50.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
         }
     }
 }
