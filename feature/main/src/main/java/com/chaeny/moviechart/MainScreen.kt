@@ -144,41 +144,56 @@ private fun MovieList() {
                     .height(450.dp)
                     .clip(RoundedCornerShape(10.dp))
             ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(movie.posterUrl)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = stringResource(R.string.movie_poster),
-                    contentScale = ContentScale.Crop,
-                    placeholder = painterResource(R.drawable.loading_img),
-                    error = painterResource(R.drawable.ic_broken_image),
-                    modifier = Modifier.fillMaxSize()
-                )
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    Color.Black.copy(alpha = 0.7f)
-                                )
-                            )
-                        )
-                )
-                Text(
-                    text = "${movie.rank}",
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(20.dp),
-                    fontSize = 50.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
+                MoviePoster(posterUrl = movie.posterUrl)
+                MovieRank(rank = movie.rank)
             }
         }
+    }
+}
+
+@Composable
+private fun MoviePoster(posterUrl: String) {
+    AsyncImage(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(posterUrl)
+            .crossfade(true)
+            .build(),
+        contentDescription = stringResource(R.string.movie_poster),
+        contentScale = ContentScale.Crop,
+        placeholder = painterResource(R.drawable.loading_img),
+        error = painterResource(R.drawable.ic_broken_image),
+        modifier = Modifier.fillMaxSize()
+    )
+}
+
+@Composable
+private fun MovieRank(rank: Int) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .height(100.dp)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            Color.Black.copy(alpha = 0.7f)
+                        )
+                    )
+                )
+        )
+        Text(
+            text = "$rank",
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(20.dp),
+            fontSize = 50.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
     }
 }
