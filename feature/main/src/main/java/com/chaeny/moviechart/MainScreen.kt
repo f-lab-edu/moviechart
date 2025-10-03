@@ -34,11 +34,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 
 @Composable
 fun MainScreen() {
@@ -138,9 +141,14 @@ private fun MovieList() {
     ) {
         items(DummyMovieData.posterUrls) { imageUrl ->
             AsyncImage(
-                model = imageUrl,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageUrl)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = stringResource(R.string.movie_poster),
                 contentScale = ContentScale.Crop,
+                placeholder = painterResource(R.drawable.loading_img),
+                error = painterResource(R.drawable.ic_broken_image),
                 modifier = Modifier
                     .width(300.dp)
                     .height(450.dp)
