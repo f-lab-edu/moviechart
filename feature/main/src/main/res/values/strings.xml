@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="movie">MOVIE</string>
+    <string name="search">Search</string>
+    <string name="daily">일간</string>
+    <string name="weekly">주간</string>
+    <string name="movie_poster">Movie poster</string>
+    <string name="movie_info">매출점유율 %1$s%% | 관객수 %2$s</string>
+    <string name="audience_acc">%d만</string>
+</resources>
