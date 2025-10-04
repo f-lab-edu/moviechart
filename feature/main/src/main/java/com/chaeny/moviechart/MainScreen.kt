@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -52,16 +53,26 @@ fun MainScreen() {
     val viewModel: MainViewModel = hiltViewModel()
     val movies by viewModel.movies.collectAsState()
     val selectedTab by viewModel.selectedTab.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
-    Column(
+    Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        TopBar()
-        PeriodTabs(
-            selectedTab = selectedTab,
-            onTabSelected = viewModel::onTabSelected
-        )
-        MovieList(movies)
+        Column {
+            TopBar()
+            PeriodTabs(
+                selectedTab = selectedTab,
+                onTabSelected = viewModel::onTabSelected
+            )
+            MovieList(movies)
+        }
+
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = Color.Black
+            )
+        }
     }
 }
 
@@ -244,8 +255,7 @@ private fun MoviePoster(posterUrl: String) {
 @Composable
 private fun MovieRank(rank: String) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         Box(
             modifier = Modifier
