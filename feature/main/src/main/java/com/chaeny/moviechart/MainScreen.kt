@@ -160,12 +160,12 @@ private fun MovieItem(movie: Movie) {
             MovieRank(rank = movie.rank)
         }
         MovieTitle(
-            title = movie.title,
+            title = movie.name,
             width = posterWidth
         )
         MovieInfo(
-            salesShare = movie.salesShare,
-            audiAcc = movie.audiAcc,
+            salesShareRate = movie.salesShareRate,
+            totalAudience = movie.totalAudience,
             width = posterWidth
         )
     }
@@ -191,15 +191,15 @@ private fun MovieTitle(
 
 @Composable
 private fun MovieInfo(
-    salesShare: String,
-    audiAcc: Int,
+    salesShareRate: String,
+    totalAudience: String,
     width: Dp
 ) {
     Text(
         text = stringResource(
             R.string.movie_info,
-            "${salesShare}%",
-            formatAudiAcc(audiAcc)
+            "${salesShareRate}%",
+            formatTotalAudience(totalAudience)
         ),
         fontSize = 14.sp,
         textAlign = TextAlign.Center,
@@ -211,11 +211,12 @@ private fun MovieInfo(
 }
 
 @Composable
-private fun formatAudiAcc(audiAcc: Int): String {
-    return if (audiAcc >= 10000) {
-        stringResource(R.string.audience_acc, audiAcc / 10000)
+private fun formatTotalAudience(totalAudience: String): String {
+    val audienceInt = totalAudience.toIntOrNull() ?: 0
+    return if (audienceInt >= 10000) {
+        stringResource(R.string.audience_acc, audienceInt / 10000)
     } else {
-        "$audiAcc"
+        totalAudience
     }
 }
 
@@ -235,7 +236,7 @@ private fun MoviePoster(posterUrl: String) {
 }
 
 @Composable
-private fun MovieRank(rank: Int) {
+private fun MovieRank(rank: String) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -255,7 +256,7 @@ private fun MovieRank(rank: Int) {
                 )
         )
         Text(
-            text = "$rank",
+            text = rank,
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(20.dp),
