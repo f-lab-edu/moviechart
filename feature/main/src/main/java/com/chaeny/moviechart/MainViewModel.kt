@@ -2,15 +2,17 @@ package com.chaeny.moviechart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.chaeny.moviechart.repository.MovieRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class MainViewModel @Inject constructor() : ViewModel() {
+internal class MainViewModel @Inject constructor(
+    private val movieRepository: MovieRepository
+) : ViewModel() {
 
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
     private val _selectedTab = MutableStateFlow(TabType.DAILY)
@@ -33,8 +35,7 @@ internal class MainViewModel @Inject constructor() : ViewModel() {
         _movies.value = emptyList()
         _isLoading.value = true
         viewModelScope.launch {
-            delay(3000)
-            _movies.value = DummyMovieData.movies
+            _movies.value = movieRepository.getMovies()
             _isLoading.value = false
         }
     }

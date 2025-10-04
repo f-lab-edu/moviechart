@@ -1,7 +1,12 @@
-package com.chaeny.moviechart
+package com.chaeny.moviechart.repository
 
-internal object DummyMovieData {
-    val movies = listOf(
+import com.chaeny.moviechart.Movie
+import javax.inject.Inject
+import kotlinx.coroutines.delay
+
+class DummyMovieRepository @Inject constructor() : MovieRepository {
+
+    private val dummyData: List<Movie> = listOf(
         Movie("1", "어쩔수가없다", "https://image.tmdb.org/t/p/w500/pf7vZxoLYtLQ366VNlGrjBxwL7A.jpg", "45.3", "833401"),
         Movie("2", "극장판 체인소 맨: 레제편", "https://image.tmdb.org/t/p/w500/Amu0HNWfpxo2ZaulueNVxDLADz8.jpg", "24.2", "368903"),
         Movie("3", "극장판 귀멸의 칼날: 무한성편", "https://image.tmdb.org/t/p/w500/m6Dho6hDCcL5KI8mOQNemZAedFI.jpg", "9.2", "4951470"),
@@ -13,4 +18,9 @@ internal object DummyMovieData {
         Movie("9", "명탐정 코난: 17년 전의 진상", "https://image.tmdb.org/t/p/w500/kI9ffyOEwj0bdpttdPEtAVDFHxC.jpg", "0.8", "67322"),
         Movie("10", "프랑켄슈타인 : 더 뮤지컬 라이브", "https://image.tmdb.org/t/p/w500/rXyniH1Xyp3xksHzZ0wSU6IqDjh.jpg", "1.6", "46122")
     )
+
+    override suspend fun getMovies(): List<Movie> {
+        delay(3000)
+        return dummyData
+    }
 }
