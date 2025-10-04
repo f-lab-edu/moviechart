@@ -26,10 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,12 +51,16 @@ import coil.request.ImageRequest
 fun MainScreen() {
     val viewModel: MainViewModel = hiltViewModel()
     val movies by viewModel.movies.collectAsState()
+    val selectedTab by viewModel.selectedTab.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         TopBar()
-        PeriodTabs()
+        PeriodTabs(
+            selectedTab = selectedTab,
+            onTabSelected = viewModel::onTabSelected
+        )
         MovieList(movies)
     }
 }
@@ -88,9 +89,10 @@ private fun TopBar() {
 }
 
 @Composable
-private fun PeriodTabs() {
-    var selectedTab by rememberSaveable { mutableStateOf(TabType.DAILY) }
-
+private fun PeriodTabs(
+    selectedTab: TabType,
+    onTabSelected: (TabType) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -101,7 +103,7 @@ private fun PeriodTabs() {
             TabItem(
                 tabType = tab,
                 isSelected = selectedTab == tab,
-                onClick = { selectedTab = tab }
+                onClick = { onTabSelected(tab) }
             )
         }
     }
@@ -289,7 +291,10 @@ private fun TopBarPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun PeriodTabsPreview() {
-    PeriodTabs()
+    PeriodTabs(
+        selectedTab = TabType.WEEKLY,
+        onTabSelected = {}
+    )
 }
 
 @Preview(showBackground = true)
