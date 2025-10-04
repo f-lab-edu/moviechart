@@ -20,15 +20,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,21 +39,40 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
 @Composable
 fun MainScreen() {
-    Column(
+    val viewModel: MainViewModel = hiltViewModel()
+    val movies by viewModel.movies.collectAsStateWithLifecycle()
+    val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+
+    Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        TopBar()
-        PeriodTabs()
-        MovieList()
+        Column {
+            TopBar()
+            PeriodTabs(
+                selectedTab = selectedTab,
+                onTabSelected = viewModel::onTabSelected
+            )
+            MovieList(movies)
+        }
+
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = Color.Black
+            )
+        }
     }
 }
 
@@ -83,9 +100,10 @@ private fun TopBar() {
 }
 
 @Composable
-private fun PeriodTabs() {
-    var selectedTab by rememberSaveable { mutableStateOf(TabType.DAILY) }
-
+private fun PeriodTabs(
+    selectedTab: TabType,
+    onTabSelected: (TabType) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -96,7 +114,7 @@ private fun PeriodTabs() {
             TabItem(
                 tabType = tab,
                 isSelected = selectedTab == tab,
-                onClick = { selectedTab = tab }
+                onClick = { onTabSelected(tab) }
             )
         }
     }
@@ -133,7 +151,7 @@ private fun TabItem(
 }
 
 @Composable
-private fun MovieList() {
+private fun MovieList(movies: List<Movie>) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
@@ -142,10 +160,10 @@ private fun MovieList() {
         contentPadding = PaddingValues(horizontal = 50.dp)
     ) {
         items(
-            items = DummyMovieData.movies,
+            items = movies,
             key = { movie -> movie.rank }
         ) { movie ->
-            MovieItem(movie = movie)
+            MovieItem(movie)
         }
     }
 }
@@ -237,8 +255,7 @@ private fun MoviePoster(posterUrl: String) {
 @Composable
 private fun MovieRank(rank: String) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         Box(
             modifier = Modifier
@@ -284,7 +301,10 @@ private fun TopBarPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun PeriodTabsPreview() {
-    PeriodTabs()
+    PeriodTabs(
+        selectedTab = TabType.WEEKLY,
+        onTabSelected = {}
+    )
 }
 
 @Preview(showBackground = true)
