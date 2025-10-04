@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,21 +42,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
 @Composable
 fun MainScreen() {
+    val viewModel: MainViewModel = hiltViewModel()
+    val movies by viewModel.movies.collectAsState()
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         TopBar()
         PeriodTabs()
-        MovieList()
+        MovieList(movies)
     }
 }
 
@@ -133,7 +138,7 @@ private fun TabItem(
 }
 
 @Composable
-private fun MovieList() {
+private fun MovieList(movies: List<Movie>) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
@@ -142,10 +147,10 @@ private fun MovieList() {
         contentPadding = PaddingValues(horizontal = 50.dp)
     ) {
         items(
-            items = DummyMovieData.movies,
+            items = movies,
             key = { movie -> movie.rank }
         ) { movie ->
-            MovieItem(movie = movie)
+            MovieItem(movie)
         }
     }
 }
