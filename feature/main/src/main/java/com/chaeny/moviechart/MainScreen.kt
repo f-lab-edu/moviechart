@@ -140,7 +140,10 @@ private fun MovieList() {
         horizontalArrangement = Arrangement.spacedBy(30.dp),
         contentPadding = PaddingValues(horizontal = 50.dp)
     ) {
-        items(DummyMovieData.movies) { movie ->
+        items(
+            items = DummyMovieData.movies,
+            key = { movie -> movie.rank }
+        ) { movie ->
             MovieItem(movie = movie)
         }
     }
@@ -148,12 +151,11 @@ private fun MovieList() {
 
 @Composable
 private fun MovieItem(movie: Movie) {
-    val posterWidth = 300.dp
     Column {
         Box(
             modifier = Modifier
-                .width(posterWidth)
-                .height(450.dp)
+                .width(POSTER_WIDTH.dp)
+                .height(POSTER_HEIGHT.dp)
                 .clip(RoundedCornerShape(10.dp))
         ) {
             MoviePoster(posterUrl = movie.posterUrl)
@@ -161,12 +163,12 @@ private fun MovieItem(movie: Movie) {
         }
         MovieTitle(
             title = movie.name,
-            width = posterWidth
+            width = POSTER_WIDTH.dp
         )
         MovieInfo(
             salesShareRate = movie.salesShareRate,
             totalAudience = movie.totalAudience,
-            width = posterWidth
+            width = POSTER_WIDTH.dp
         )
     }
 }
@@ -196,11 +198,7 @@ private fun MovieInfo(
     width: Dp
 ) {
     Text(
-        text = stringResource(
-            R.string.movie_info,
-            "${salesShareRate}%",
-            formatTotalAudience(totalAudience)
-        ),
+        text = stringResource(R.string.movie_info, salesShareRate, formatAudience(totalAudience)),
         fontSize = 14.sp,
         textAlign = TextAlign.Center,
         color = Color.Gray,
@@ -211,12 +209,12 @@ private fun MovieInfo(
 }
 
 @Composable
-private fun formatTotalAudience(totalAudience: String): String {
-    val audienceInt = totalAudience.toIntOrNull() ?: 0
+private fun formatAudience(audience: String): String {
+    val audienceInt = audience.toIntOrNull() ?: 0
     return if (audienceInt >= 10000) {
         stringResource(R.string.audience_acc, audienceInt / 10000)
     } else {
-        totalAudience
+        audience
     }
 }
 
@@ -266,3 +264,6 @@ private fun MovieRank(rank: String) {
         )
     }
 }
+
+private const val POSTER_WIDTH = 300
+private const val POSTER_HEIGHT = 450
