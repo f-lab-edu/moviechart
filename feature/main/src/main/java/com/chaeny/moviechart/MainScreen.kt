@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
@@ -267,3 +268,45 @@ private fun MovieRank(rank: String) {
 
 private const val POSTER_WIDTH = 300
 private const val POSTER_HEIGHT = 450
+
+@Preview(showBackground = true)
+@Composable
+private fun MainScreenPreview() {
+    MainScreen()
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TopBarPreview() {
+    TopBar()
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PeriodTabsPreview() {
+    PeriodTabs()
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TabItemPreview() {
+    TabItem(
+        tabType = TabType.DAILY,
+        isSelected = true,
+        onClick = {}
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MovieItemPreview() {
+    MovieItem(
+        movie = Movie(
+            rank = "1",
+            name = "어쩔수가없다",
+            posterUrl = "https://image.tmdb.org/t/p/w500/pf7vZxoLYtLQ366VNlGrjBxwL7A.jpg",
+            salesShareRate = "45.3",
+            totalAudience = "833401"
+        )
+    )
+}
