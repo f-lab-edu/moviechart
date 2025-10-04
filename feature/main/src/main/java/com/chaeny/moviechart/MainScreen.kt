@@ -41,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -140,42 +141,73 @@ private fun MovieList() {
         contentPadding = PaddingValues(horizontal = 50.dp)
     ) {
         items(DummyMovieData.movies) { movie ->
-            val posterWidth = 300.dp
-            Column {
-                Box(
-                    modifier = Modifier
-                        .width(posterWidth)
-                        .height(450.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                ) {
-                    MoviePoster(posterUrl = movie.posterUrl)
-                    MovieRank(rank = movie.rank)
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    text = movie.title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.width(posterWidth)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(
-                        R.string.movie_info,
-                        "${movie.salesShare}%",
-                        formatAudiAcc(movie.audiAcc)
-                    ),
-                    fontSize = 14.sp,
-                    textAlign = TextAlign.Center,
-                    color = Color.Gray,
-                    modifier = Modifier.width(posterWidth)
-                )
-            }
+            MovieItem(movie = movie)
         }
     }
+}
+
+@Composable
+private fun MovieItem(movie: Movie) {
+    val posterWidth = 300.dp
+    Column {
+        Box(
+            modifier = Modifier
+                .width(posterWidth)
+                .height(450.dp)
+                .clip(RoundedCornerShape(10.dp))
+        ) {
+            MoviePoster(posterUrl = movie.posterUrl)
+            MovieRank(rank = movie.rank)
+        }
+        MovieTitle(
+            title = movie.title,
+            width = posterWidth
+        )
+        MovieInfo(
+            salesShare = movie.salesShare,
+            audiAcc = movie.audiAcc,
+            width = posterWidth
+        )
+    }
+}
+
+@Composable
+private fun MovieTitle(
+    title: String,
+    width: Dp
+) {
+    Text(
+        text = title,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Medium,
+        textAlign = TextAlign.Center,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier
+            .width(width)
+            .padding(top = 20.dp)
+    )
+}
+
+@Composable
+private fun MovieInfo(
+    salesShare: String,
+    audiAcc: Int,
+    width: Dp
+) {
+    Text(
+        text = stringResource(
+            R.string.movie_info,
+            "${salesShare}%",
+            formatAudiAcc(audiAcc)
+        ),
+        fontSize = 14.sp,
+        textAlign = TextAlign.Center,
+        color = Color.Gray,
+        modifier = Modifier
+            .width(width)
+            .padding(top = 8.dp)
+    )
 }
 
 @Composable
