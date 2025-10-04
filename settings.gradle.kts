@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "moviechart"
 include(":app")
 include(":feature:main")
+include(":core:data")
