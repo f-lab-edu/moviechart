@@ -30,6 +30,7 @@ internal class MainViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun loadMovies() {
+        _movies.value = emptyList()
         _isLoading.value = true
         viewModelScope.launch {
             delay(3000)
