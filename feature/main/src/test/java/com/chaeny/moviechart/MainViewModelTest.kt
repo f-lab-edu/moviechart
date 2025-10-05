@@ -52,10 +52,11 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `when viewModel created then selectedTab should be DAILY`() {
+    fun `when viewModel created then selectedTab should be DAILY and repository called with DAILY`() {
         viewModel = createViewModel(TEST_KOBIS_MOVIES, TEST_POSTER_URLS)
 
         assertEquals(TabType.DAILY, viewModel.selectedTab.value)
+        coVerify { kobisRepository.getMovies(TabType.DAILY) }
     }
 
     @Test
@@ -74,6 +75,28 @@ class MainViewModelTest {
 
         assertEquals(TabType.WEEKLY, viewModel.selectedTab.value)
         coVerify { kobisRepository.getMovies(TabType.WEEKLY) }
+    }
+
+    @Test
+    fun `when kobisMovie and posterUrl are combined then Movie should be returned correctly`() {
+        val testKobisMovies = listOf(
+            KobisMovie("1", "20243561", "어쩔수가없다", "45.3", "833401"),
+            KobisMovie("2", "20256757", "극장판 체인소 맨: 레제편", "24.2", "368903")
+        )
+        val testPosterUrls = mapOf(
+            "639988" to "test1.jpg",
+            "1218925" to "test2.jpg"
+        )
+        stubKobisRepository(testKobisMovies)
+        stubTmdbRepository(testPosterUrls)
+        val viewModel = MainViewModel(kobisRepository, tmdbRepository, movieIdMapper)
+
+        coVerify(exactly = 2) { tmdbRepository.getPosterUrl(any()) }
+        val expectedMovies = listOf(
+            Movie("1", "20243561", "어쩔수가없다", "45.3", "833401", "test1.jpg"),
+            Movie("2", "20256757", "극장판 체인소 맨: 레제편", "24.2", "368903", "test2.jpg")
+        )
+        assertEquals(expectedMovies, viewModel.movies.value)
     }
 
     companion object {
