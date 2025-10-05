@@ -141,6 +141,30 @@ class MainViewModelTest {
         assertEquals(expectedMovie, viewModel.movies.value)
     }
 
+    @Test
+    fun `when switching between tabs then movies should update correctly`() {
+        val dailyMovies = listOf(KobisMovie("1", "20243561", "어쩔수가없다", "45.3", "833401"))
+        val dailyPosterUrls = mapOf("639988" to "daily.jpg")
+        val weeklyMovies = listOf(KobisMovie("1", "20242964", "얼굴", "30.0", "500000"))
+        val weeklyPosterUrls = mapOf("1316719" to "weekly.jpg")
+
+        coEvery { kobisRepository.getMovies(TabType.DAILY) } returns dailyMovies
+        stubTmdbRepository(dailyPosterUrls)
+        viewModel = MainViewModel(kobisRepository, tmdbRepository, movieIdMapper)
+
+        val expectedDailyMovie = listOf(Movie("1", "20243561", "어쩔수가없다", "45.3", "833401", "daily.jpg"))
+        assertEquals(expectedDailyMovie, viewModel.movies.value)
+
+        coEvery { kobisRepository.getMovies(TabType.WEEKLY) } returns weeklyMovies
+        stubTmdbRepository(weeklyPosterUrls)
+        viewModel.onTabSelected(TabType.WEEKLY)
+        val expectedWeeklyMovie = listOf(Movie("1", "20242964", "얼굴", "30.0", "500000", "weekly.jpg"))
+        assertEquals(expectedWeeklyMovie, viewModel.movies.value)
+
+        viewModel.onTabSelected(TabType.DAILY)
+        assertEquals(expectedDailyMovie, viewModel.movies.value)
+    }
+
     companion object {
         private val TEST_KOBIS_MOVIES = listOf(
             KobisMovie(
