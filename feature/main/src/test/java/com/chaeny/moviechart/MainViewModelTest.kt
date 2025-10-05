@@ -20,6 +20,7 @@ class MainViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineScopeRule()
 
+    private lateinit var viewModel: MainViewModel
     private lateinit var kobisRepository: KobisRepository
     private lateinit var tmdbRepository: TmdbRepository
     private lateinit var movieIdMapper: MovieIdMapper
@@ -31,21 +32,35 @@ class MainViewModelTest {
         movieIdMapper = MovieIdMapper()
     }
 
+    private fun createViewModel(
+        kobisMovies: List<KobisMovie>,
+        posterUrls: Map<String, String>
+    ): MainViewModel {
+        stubKobisRepository(kobisMovies)
+        stubTmdbRepository(posterUrls)
+        return MainViewModel(kobisRepository, tmdbRepository, movieIdMapper)
+    }
+
+    private fun stubKobisRepository(kobisMovies: List<KobisMovie>) {
+        coEvery { kobisRepository.getMovies(any()) } returns kobisMovies
+    }
+
+    private fun stubTmdbRepository(posterUrls: Map<String, String>) {
+        posterUrls.forEach { (movieId, url) ->
+            coEvery { tmdbRepository.getPosterUrl(movieId) } returns url
+        }
+    }
+
     @Test
     fun `when viewModel created then selectedTab should be DAILY`() {
-        coEvery { kobisRepository.getMovies(any()) } returns emptyList()
-
-        val viewModel = MainViewModel(kobisRepository, tmdbRepository, movieIdMapper)
+        viewModel = createViewModel(TEST_KOBIS_MOVIES, TEST_POSTER_URLS)
 
         assertEquals(TabType.DAILY, viewModel.selectedTab.value)
     }
 
     @Test
     fun `when data loading completes then isLoading should be false`() {
-        coEvery { kobisRepository.getMovies(any()) } returns TEST_KOBIS_MOVIES
-        coEvery { tmdbRepository.getPosterUrl(any()) } returns ""
-
-        val viewModel = MainViewModel(kobisRepository, tmdbRepository, movieIdMapper)
+        viewModel = createViewModel(TEST_KOBIS_MOVIES, TEST_POSTER_URLS)
 
         coVerify { kobisRepository.getMovies(any()) }
         coVerify { tmdbRepository.getPosterUrl(any()) }
@@ -54,9 +69,7 @@ class MainViewModelTest {
 
     @Test
     fun `when onTabSelected WEEKLY then selectedTab should be WEEKLY and repository called`() {
-        coEvery { kobisRepository.getMovies(any()) } returns emptyList()
-        val viewModel = MainViewModel(kobisRepository, tmdbRepository, movieIdMapper)
-
+        viewModel = createViewModel(TEST_KOBIS_MOVIES, TEST_POSTER_URLS)
         viewModel.onTabSelected(TabType.WEEKLY)
 
         assertEquals(TabType.WEEKLY, viewModel.selectedTab.value)
@@ -79,6 +92,10 @@ class MainViewModelTest {
                 salesShareRate = "24.2",
                 accumulatedAudience = "368903"
             )
+        )
+        private val TEST_POSTER_URLS = mapOf(
+            "639988" to "https://image.tmdb.org/t/p/w500/test1.jpg",
+            "1218925" to "https://image.tmdb.org/t/p/w500/test2.jpg"
         )
     }
 
