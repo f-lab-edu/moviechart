@@ -323,10 +323,11 @@ private fun MovieItemPreview() {
     MovieItem(
         movie = Movie(
             rank = "1",
+            movieId = "1",
             name = "어쩔수가없다",
-            posterUrl = "https://image.tmdb.org/t/p/w500/pf7vZxoLYtLQ366VNlGrjBxwL7A.jpg",
             salesShareRate = "45.3",
-            totalAudience = "833401"
+            totalAudience = "833401",
+            posterUrl = "https://image.tmdb.org/t/p/w500/pf7vZxoLYtLQ366VNlGrjBxwL7A.jpg"
         )
     )
 }
