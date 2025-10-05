@@ -109,6 +109,38 @@ class MainViewModelTest {
         verify(exactly = 2) { movieIdMapper.getTmdbId(any()) }
     }
 
+    @Test
+    fun `when repository returns empty list then movies should be empty`() {
+        viewModel = createViewModel(emptyList(), emptyMap())
+
+        assertEquals(emptyList<Movie>(), viewModel.movies.value)
+        coVerify(exactly = 1) { kobisRepository.getMovies(any()) }
+        coVerify(exactly = 0) { tmdbRepository.getPosterUrl(any()) }
+    }
+
+    @Test
+    fun `when posterUrl is not available then movie should have empty posterUrl`() {
+        val testKobisMovie = listOf(KobisMovie("1", "20243561", "어쩔수가없다", "45.3", "833401"))
+        stubKobisRepository(testKobisMovie)
+        coEvery { tmdbRepository.getPosterUrl(any()) } returns ""
+        viewModel = MainViewModel(kobisRepository, tmdbRepository, movieIdMapper)
+
+        val expectedMovie = listOf(Movie("1", "20243561", "어쩔수가없다", "45.3", "833401", ""))
+        assertEquals(expectedMovie, viewModel.movies.value)
+    }
+
+    @Test
+    fun `when kobis id is not mapped then tmdb id should be empty`() {
+        val unmappedKobisMovie = listOf(KobisMovie("1", "0", "unknown", "10.0", "10"))
+        stubKobisRepository(unmappedKobisMovie)
+        coEvery { tmdbRepository.getPosterUrl("") } returns ""
+        viewModel = MainViewModel(kobisRepository, tmdbRepository, movieIdMapper)
+
+        assertEquals("", movieIdMapper.getTmdbId("0"))
+        val expectedMovie = listOf(Movie("1", "0", "unknown", "10.0", "10", ""))
+        assertEquals(expectedMovie, viewModel.movies.value)
+    }
+
     companion object {
         private val TEST_KOBIS_MOVIES = listOf(
             KobisMovie(
