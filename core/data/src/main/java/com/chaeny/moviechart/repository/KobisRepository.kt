@@ -1,7 +1,7 @@
 package com.chaeny.moviechart.repository
 
-import com.chaeny.moviechart.Movie
+import com.chaeny.moviechart.dto.KobisMovie
 
 interface KobisRepository {
-    suspend fun getMovies(): List<Movie>
+    suspend fun getMovies(): List<KobisMovie>
 }

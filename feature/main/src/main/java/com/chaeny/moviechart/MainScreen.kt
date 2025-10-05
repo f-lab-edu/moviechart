@@ -323,7 +323,7 @@ private fun MovieItemPreview() {
     MovieItem(
         movie = Movie(
             rank = "1",
-            movieId = "1",
+            id = "1",
             name = "어쩔수가없다",
             salesShareRate = "45.3",
             totalAudience = "833401",

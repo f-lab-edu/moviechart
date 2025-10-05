@@ -2,6 +2,7 @@ package com.chaeny.moviechart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.chaeny.moviechart.dto.KobisMovie
 import com.chaeny.moviechart.mapper.MovieIdMapper
 import com.chaeny.moviechart.repository.KobisRepository
 import com.chaeny.moviechart.repository.TmdbRepository
@@ -49,13 +50,21 @@ internal class MainViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadMoviePosters(movies: List<Movie>): List<Movie> {
+    private suspend fun loadMoviePosters(kobisMovies: List<KobisMovie>): List<Movie> {
         return coroutineScope {
-            movies.map { movie ->
+            kobisMovies.map { kobisMovie ->
                 async {
-                    val tmdbId = movieIdMapper.getTmdbId(movie.movieId)
+                    val tmdbId = movieIdMapper.getTmdbId(kobisMovie.id)
                     val posterUrl = tmdbRepository.getPosterUrl(tmdbId)
-                    movie.copy(posterUrl = posterUrl)
+
+                    Movie(
+                        rank = kobisMovie.rank,
+                        id = kobisMovie.id,
+                        name = kobisMovie.name,
+                        salesShareRate = kobisMovie.salesShareRate,
+                        totalAudience = kobisMovie.accumulatedAudience,
+                        posterUrl = posterUrl
+                    )
                 }
             }.awaitAll()
         }
