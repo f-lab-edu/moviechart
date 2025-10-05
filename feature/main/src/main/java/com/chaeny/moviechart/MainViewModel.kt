@@ -2,15 +2,25 @@ package com.chaeny.moviechart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.chaeny.moviechart.dto.KobisMovie
+import com.chaeny.moviechart.mapper.MovieIdMapper
+import com.chaeny.moviechart.repository.KobisRepository
+import com.chaeny.moviechart.repository.TmdbRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class MainViewModel @Inject constructor() : ViewModel() {
+internal class MainViewModel @Inject constructor(
+    private val kobisRepository: KobisRepository,
+    private val tmdbRepository: TmdbRepository,
+    private val movieIdMapper: MovieIdMapper
+) : ViewModel() {
 
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
     private val _selectedTab = MutableStateFlow(TabType.DAILY)
@@ -33,9 +43,30 @@ internal class MainViewModel @Inject constructor() : ViewModel() {
         _movies.value = emptyList()
         _isLoading.value = true
         viewModelScope.launch {
-            delay(3000)
-            _movies.value = DummyMovieData.movies
+            val kobisMovies = kobisRepository.getMovies(_selectedTab.value)
+            val moviesWithPosters = loadMoviePosters(kobisMovies)
+            _movies.value = moviesWithPosters
             _isLoading.value = false
+        }
+    }
+
+    private suspend fun loadMoviePosters(kobisMovies: List<KobisMovie>): List<Movie> {
+        return coroutineScope {
+            kobisMovies.map { kobisMovie ->
+                async {
+                    val tmdbId = movieIdMapper.getTmdbId(kobisMovie.id)
+                    val posterUrl = tmdbRepository.getPosterUrl(tmdbId)
+
+                    Movie(
+                        rank = kobisMovie.rank,
+                        id = kobisMovie.id,
+                        name = kobisMovie.name,
+                        salesShareRate = kobisMovie.salesShareRate,
+                        totalAudience = kobisMovie.accumulatedAudience,
+                        posterUrl = posterUrl
+                    )
+                }
+            }.awaitAll()
         }
     }
 }

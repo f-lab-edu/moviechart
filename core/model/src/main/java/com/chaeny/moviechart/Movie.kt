@@ -1,9 +1,10 @@
 package com.chaeny.moviechart
 
-internal data class Movie(
+data class Movie(
     val rank: String,
+    val id: String,
     val name: String,
-    val posterUrl: String,
     val salesShareRate: String,
-    val totalAudience: String
+    val totalAudience: String,
+    val posterUrl: String
 )
