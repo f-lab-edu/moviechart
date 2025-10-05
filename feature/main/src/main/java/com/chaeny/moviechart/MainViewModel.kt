@@ -42,16 +42,20 @@ internal class MainViewModel @Inject constructor(
         _movies.value = emptyList()
         _isLoading.value = true
         viewModelScope.launch {
-            _movies.value = getUpdatedMovies(kobisRepository.getMovies())
+            val kobisMovies = kobisRepository.getMovies()
+            val moviesWithPosters = loadMoviePosters(kobisMovies)
+            _movies.value = moviesWithPosters
             _isLoading.value = false
         }
     }
 
-    private suspend fun getUpdatedMovies(movies: List<Movie>) : List<Movie> {
+    private suspend fun loadMoviePosters(movies: List<Movie>): List<Movie> {
         return coroutineScope {
             movies.map { movie ->
                 async {
-                    movie.copy(posterUrl = tmdbRepository.getPosterUrl(movieIdMapper.getTmdbId(movie.movieId)!!))
+                    val tmdbId = movieIdMapper.getTmdbId(movie.movieId)
+                    val posterUrl = tmdbRepository.getPosterUrl(tmdbId)
+                    movie.copy(posterUrl = posterUrl)
                 }
             }.awaitAll()
         }

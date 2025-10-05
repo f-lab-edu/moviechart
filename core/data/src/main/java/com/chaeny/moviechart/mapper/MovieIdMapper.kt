@@ -17,7 +17,7 @@ class MovieIdMapper @Inject constructor() {
         "20256864" to "1519318"   // 프랑켄슈타인 : 더 뮤지컬 라이브
     )
 
-    fun getTmdbId(kobisMovieId: String): String? {
-        return kobisToTmdbMap[kobisMovieId]
+    fun getTmdbId(kobisMovieId: String): String {
+        return kobisToTmdbMap[kobisMovieId] ?: ""
     }
 }
