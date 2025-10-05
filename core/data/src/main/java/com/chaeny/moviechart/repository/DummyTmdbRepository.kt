@@ -15,7 +15,8 @@ class DummyTmdbRepository @Inject constructor() : TmdbRepository {
         "911430" to "/bvVoP1t2gNvmE9ccSrqR1zcGHGM.jpg",
         "1228018" to "/eSNprN73xK9LKN8f5y5Ee446QzK.jpg",
         "1540229" to "/kI9ffyOEwj0bdpttdPEtAVDFHxC.jpg",
-        "1519318" to "/rXyniH1Xyp3xksHzZ0wSU6IqDjh.jpg"
+        "1519318" to "/rXyniH1Xyp3xksHzZ0wSU6IqDjh.jpg",
+        "1151766" to "/rcmJRflS4aFJg8Ockk7YePQWlzc.jpg"
     )
 
     override suspend fun getPosterUrl(movieId: String): String {

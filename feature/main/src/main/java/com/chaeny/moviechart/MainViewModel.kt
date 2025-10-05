@@ -43,7 +43,7 @@ internal class MainViewModel @Inject constructor(
         _movies.value = emptyList()
         _isLoading.value = true
         viewModelScope.launch {
-            val kobisMovies = kobisRepository.getMovies()
+            val kobisMovies = kobisRepository.getMovies(_selectedTab.value)
             val moviesWithPosters = loadMoviePosters(kobisMovies)
             _movies.value = moviesWithPosters
             _isLoading.value = false

@@ -136,7 +136,10 @@ private fun TabItem(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(tabType.tabResId),
+            text = when (tabType) {
+                TabType.DAILY -> stringResource(R.string.daily)
+                TabType.WEEKLY -> stringResource(R.string.weekly)
+            },
             fontSize = 16.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
         )
