@@ -8,6 +8,8 @@ import com.chaeny.moviechart.util.MainCoroutineScopeRule
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -29,7 +31,7 @@ class MainViewModelTest {
     fun setup() {
         kobisRepository = mockk()
         tmdbRepository = mockk()
-        movieIdMapper = MovieIdMapper()
+        movieIdMapper = spyk(MovieIdMapper())
     }
 
     private fun createViewModel(
@@ -91,12 +93,20 @@ class MainViewModelTest {
         stubTmdbRepository(testPosterUrls)
         val viewModel = MainViewModel(kobisRepository, tmdbRepository, movieIdMapper)
 
+        verify(exactly = 2) { movieIdMapper.getTmdbId(any()) }
         coVerify(exactly = 2) { tmdbRepository.getPosterUrl(any()) }
         val expectedMovies = listOf(
             Movie("1", "20243561", "어쩔수가없다", "45.3", "833401", "test1.jpg"),
             Movie("2", "20256757", "극장판 체인소 맨: 레제편", "24.2", "368903", "test2.jpg")
         )
         assertEquals(expectedMovies, viewModel.movies.value)
+    }
+
+    @Test
+    fun `when getTmdbId called with kobis id then correct tmdb id should be returned`() {
+        assertEquals("639988", movieIdMapper.getTmdbId("20243561"))
+        assertEquals("1218925", movieIdMapper.getTmdbId("20256757"))
+        verify(exactly = 2) { movieIdMapper.getTmdbId(any()) }
     }
 
     companion object {
