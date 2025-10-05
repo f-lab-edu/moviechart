@@ -52,6 +52,17 @@ class MainViewModelTest {
         assertEquals(false, viewModel.isLoading.value)
     }
 
+    @Test
+    fun `when onTabSelected WEEKLY then selectedTab should be WEEKLY and repository called`() {
+        coEvery { kobisRepository.getMovies(any()) } returns emptyList()
+        val viewModel = MainViewModel(kobisRepository, tmdbRepository, movieIdMapper)
+
+        viewModel.onTabSelected(TabType.WEEKLY)
+
+        assertEquals(TabType.WEEKLY, viewModel.selectedTab.value)
+        coVerify { kobisRepository.getMovies(TabType.WEEKLY) }
+    }
+
     companion object {
         private val TEST_KOBIS_MOVIES = listOf(
             KobisMovie(
