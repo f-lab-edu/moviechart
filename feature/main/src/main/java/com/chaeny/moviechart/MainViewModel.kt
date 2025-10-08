@@ -35,6 +35,7 @@ internal class MainViewModel @Inject constructor(
     }
 
     fun onTabSelected(tabType: TabType) {
+        if (_selectedTab.value == tabType) return
         _selectedTab.value = tabType
         loadMovies()
     }
