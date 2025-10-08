@@ -180,6 +180,15 @@ class MainViewModelTest {
         assertEquals(expectedDailyMovie, viewModel.movies.value)
     }
 
+    @Test
+    fun `when same tab is selected again then repository should not be called`() {
+        viewModel = createViewModel(TEST_KOBIS_MOVIES, TEST_POSTER_URLS)
+
+        viewModel.onTabSelected(TabType.DAILY)
+
+        coVerify(exactly = 1) { kobisRepository.getMovies(TabType.DAILY) }
+    }
+
     companion object {
         private val TEST_KOBIS_MOVIES = listOf(
             KobisMovie(
