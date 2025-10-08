@@ -10,7 +10,12 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -67,6 +72,16 @@ class MainViewModelTest {
 
         coVerify { kobisRepository.getMovies(any()) }
         coVerify { tmdbRepository.getPosterUrl(any()) }
+        assertEquals(false, viewModel.isLoading.value)
+    }
+
+    @Test
+    fun `when movies are loading then isLoading should be true and false after completion`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        viewModel = createViewModel(TEST_KOBIS_MOVIES, TEST_POSTER_URLS)
+
+        assertEquals(true, viewModel.isLoading.value)
+        advanceUntilIdle()
         assertEquals(false, viewModel.isLoading.value)
     }
 
