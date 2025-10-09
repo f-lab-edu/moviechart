@@ -1,6 +1,5 @@
 package com.chaeny.moviechart.repository
 
-import android.util.Log
 import com.chaeny.moviechart.network.TmdbApiService
 import java.io.IOException
 import javax.inject.Inject
@@ -14,10 +13,8 @@ class ApiTmdbRepository @Inject constructor(
             val response = tmdbApiService.getMovieDetails(movieId = movieId)
             response.poster_path.toPosterUrl()
         } catch (e: IOException) {
-            Log.e("ApiTmdbRepository", "getPosterUrl(movieId=$movieId) - IOException: ${e.message}")
             ""
         } catch (e: Exception) {
-            Log.e("ApiTmdbRepository", "getPosterUrl(movieId=$movieId) - Exception: ${e.message}")
             ""
         }
     }

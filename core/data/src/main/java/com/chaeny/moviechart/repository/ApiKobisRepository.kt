@@ -1,22 +1,22 @@
 package com.chaeny.moviechart.repository
 
-import android.util.Log
 import com.chaeny.moviechart.Movie
 import com.chaeny.moviechart.TabType
 import com.chaeny.moviechart.model.BoxOfficeItem
 import com.chaeny.moviechart.network.KobisApiService
 import java.io.IOException
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 class ApiKobisRepository @Inject constructor(
     private val kobisApiService: KobisApiService
 ) : KobisRepository {
 
-    override suspend fun getMovies(tabType: TabType): List<Movie> {
+    override suspend fun getMovies(tabType: TabType): GetMoviesResult {
         return try {
             val targetDate = "20250927"
 
-            when (tabType) {
+            val movies = when (tabType) {
                 TabType.DAILY -> kobisApiService.getDailyBoxOffice(targetDate = targetDate)
                     .boxOfficeResult.dailyBoxOfficeList
                     .map { it.toMovie() }
@@ -25,12 +25,16 @@ class ApiKobisRepository @Inject constructor(
                     .boxOfficeResult.weeklyBoxOfficeList
                     .map { it.toMovie() }
             }
-        } catch (e: IOException) {
-            Log.e("ApiKobisRepository", "getMovies(tabType=$tabType) - IOException: ${e.message}")
-            emptyList()
+            when {
+                movies.isNotEmpty() -> GetMoviesResult.Success(movies)
+                else -> GetMoviesResult.NoResult
+            }
         } catch (e: Exception) {
-            Log.e("ApiKobisRepository", "getMovies(tabType=$tabType) - Exception: ${e.message}")
-            emptyList()
+            when (e) {
+                is UnknownHostException -> GetMoviesResult.NoInternet
+                is IOException -> GetMoviesResult.NetworkError
+                else -> GetMoviesResult.NetworkError
+            }
         }
     }
 

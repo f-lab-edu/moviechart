@@ -1,6 +1,7 @@
 package com.chaeny.moviechart
 
 import com.chaeny.moviechart.mapper.MovieIdMapper
+import com.chaeny.moviechart.repository.GetMoviesResult
 import com.chaeny.moviechart.repository.KobisRepository
 import com.chaeny.moviechart.repository.TmdbRepository
 import com.chaeny.moviechart.util.MainCoroutineScopeRule
@@ -48,7 +49,7 @@ class MainViewModelTest {
     }
 
     private fun stubKobisRepository(movieList: List<Movie>) {
-        coEvery { kobisRepository.getMovies(any()) } returns movieList
+        coEvery { kobisRepository.getMovies(any()) } returns GetMoviesResult.Success(movieList)
     }
 
     private fun stubTmdbRepository(posterUrls: Map<String, String>) {
@@ -162,14 +163,14 @@ class MainViewModelTest {
         val weeklyMovies = listOf(Movie("1", "20242964", "얼굴", "30.0", "500000"))
         val weeklyPosterUrls = mapOf("1316719" to "weekly.jpg")
 
-        coEvery { kobisRepository.getMovies(TabType.DAILY) } returns dailyMovies
+        coEvery { kobisRepository.getMovies(TabType.DAILY) } returns GetMoviesResult.Success(dailyMovies)
         stubTmdbRepository(dailyPosterUrls)
         viewModel = MainViewModel(kobisRepository, tmdbRepository, movieIdMapper)
 
         val expectedDailyMovie = listOf(Movie("1", "20243561", "어쩔수가없다", "45.3", "833401", "daily.jpg"))
         assertEquals(expectedDailyMovie, viewModel.movies.value)
 
-        coEvery { kobisRepository.getMovies(TabType.WEEKLY) } returns weeklyMovies
+        coEvery { kobisRepository.getMovies(TabType.WEEKLY) } returns GetMoviesResult.Success(weeklyMovies)
         stubTmdbRepository(weeklyPosterUrls)
         viewModel.onTabSelected(TabType.WEEKLY)
         val expectedWeeklyMovie = listOf(Movie("1", "20242964", "얼굴", "30.0", "500000", "weekly.jpg"))

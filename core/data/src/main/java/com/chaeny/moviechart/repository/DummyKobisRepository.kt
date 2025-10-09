@@ -33,11 +33,12 @@ class DummyKobisRepository @Inject constructor() : KobisRepository {
         Movie("10", "20233039", "살인자 리포트", "0.5", "364379")
     )
 
-    override suspend fun getMovies(tabType: TabType): List<Movie> {
+    override suspend fun getMovies(tabType: TabType): GetMoviesResult {
         delay(2000)
-        return when (tabType) {
+        val movies = when (tabType) {
             TabType.DAILY -> dailyData
             TabType.WEEKLY -> weeklyData
         }
+        return GetMoviesResult.Success(movies)
     }
 }
