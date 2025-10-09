@@ -1,6 +1,6 @@
 package com.chaeny.moviechart
 
-data class KobisMovie(
+data class BoxOffice(
     val rank: String,
     val id: String,
     val name: String,

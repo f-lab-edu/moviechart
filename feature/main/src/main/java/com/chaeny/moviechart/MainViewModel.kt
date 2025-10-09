@@ -50,19 +50,19 @@ internal class MainViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadMoviePosters(kobisMovies: List<KobisMovie>): List<Movie> {
+    private suspend fun loadMoviePosters(movies: List<BoxOffice>): List<Movie> {
         return coroutineScope {
-            kobisMovies.map { kobisMovie ->
+            movies.map { movie ->
                 async {
-                    val tmdbId = movieIdMapper.getTmdbId(kobisMovie.id)
+                    val tmdbId = movieIdMapper.getTmdbId(movie.id)
                     val posterUrl = tmdbRepository.getPosterUrl(tmdbId)
 
                     Movie(
-                        rank = kobisMovie.rank,
-                        id = kobisMovie.id,
-                        name = kobisMovie.name,
-                        salesShareRate = kobisMovie.salesShareRate,
-                        totalAudience = kobisMovie.accumulatedAudience,
+                        rank = movie.rank,
+                        id = movie.id,
+                        name = movie.name,
+                        salesShareRate = movie.salesShareRate,
+                        totalAudience = movie.accumulatedAudience,
                         posterUrl = posterUrl
                     )
                 }
