@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kapt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -34,6 +35,12 @@ android {
 }
 
 dependencies {
+    implementation(libs.retrofit)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit.kotlin.serialization)
+
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
 
