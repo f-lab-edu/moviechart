@@ -1,9 +1,10 @@
 package com.chaeny.moviechart
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.chaeny.moviechart.dto.KobisMovie
 import com.chaeny.moviechart.mapper.MovieIdMapper
+import com.chaeny.moviechart.repository.GetMoviesResult
 import com.chaeny.moviechart.repository.KobisRepository
 import com.chaeny.moviechart.repository.TmdbRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -44,28 +45,40 @@ internal class MainViewModel @Inject constructor(
         _movies.value = emptyList()
         _isLoading.value = true
         viewModelScope.launch {
-            val kobisMovies = kobisRepository.getMovies(_selectedTab.value)
-            val moviesWithPosters = loadMoviePosters(kobisMovies)
-            _movies.value = moviesWithPosters
+            val result = kobisRepository.getMovies(_selectedTab.value)
+            handleMoviesResult(result)
             _isLoading.value = false
         }
     }
 
-    private suspend fun loadMoviePosters(kobisMovies: List<KobisMovie>): List<Movie> {
-        return coroutineScope {
-            kobisMovies.map { kobisMovie ->
-                async {
-                    val tmdbId = movieIdMapper.getTmdbId(kobisMovie.id)
-                    val posterUrl = tmdbRepository.getPosterUrl(tmdbId)
+    private suspend fun handleMoviesResult(result: GetMoviesResult) {
+        when (result) {
+            is GetMoviesResult.Success -> {
+                val moviesWithPosters = loadMoviePosters(result.movies)
+                _movies.value = moviesWithPosters
+            }
+            is GetMoviesResult.NoResult -> {
+                Log.w("MainViewModel", "NoResult")
+                _movies.value = emptyList()
+            }
+            is GetMoviesResult.NoInternet -> {
+                Log.e("MainViewModel", "NoInternet")
+                _movies.value = emptyList()
+            }
+            is GetMoviesResult.NetworkError -> {
+                Log.e("MainViewModel", "NetworkError")
+                _movies.value = emptyList()
+            }
+        }
+    }
 
-                    Movie(
-                        rank = kobisMovie.rank,
-                        id = kobisMovie.id,
-                        name = kobisMovie.name,
-                        salesShareRate = kobisMovie.salesShareRate,
-                        totalAudience = kobisMovie.accumulatedAudience,
-                        posterUrl = posterUrl
-                    )
+    private suspend fun loadMoviePosters(movies: List<Movie>): List<Movie> {
+        return coroutineScope {
+            movies.map { movie ->
+                async {
+                    val tmdbId = movieIdMapper.getTmdbId(movie.id)
+                    val posterUrl = tmdbRepository.getPosterUrl(tmdbId)
+                    movie.copy(posterUrl = posterUrl)
                 }
             }.awaitAll()
         }

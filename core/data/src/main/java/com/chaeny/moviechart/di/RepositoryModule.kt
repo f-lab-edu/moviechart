@@ -1,7 +1,7 @@
 package com.chaeny.moviechart.di
 
-import com.chaeny.moviechart.repository.DummyKobisRepository
-import com.chaeny.moviechart.repository.DummyTmdbRepository
+import com.chaeny.moviechart.repository.ApiKobisRepository
+import com.chaeny.moviechart.repository.ApiTmdbRepository
 import com.chaeny.moviechart.repository.KobisRepository
 import com.chaeny.moviechart.repository.TmdbRepository
 import dagger.Binds
@@ -16,9 +16,9 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindKobisRepository(dummyKobisRepository: DummyKobisRepository): KobisRepository
+    abstract fun bindKobisRepository(dummyKobisRepository: ApiKobisRepository): KobisRepository
 
     @Binds
     @Singleton
-    abstract fun bindTmdbRepository(dummyTmdbRepository: DummyTmdbRepository): TmdbRepository
+    abstract fun bindTmdbRepository(dummyTmdbRepository: ApiTmdbRepository): TmdbRepository
 }

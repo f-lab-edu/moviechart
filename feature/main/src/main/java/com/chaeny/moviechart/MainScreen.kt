@@ -164,7 +164,7 @@ private fun MovieList(movies: List<Movie>) {
     ) {
         items(
             items = movies,
-            key = { movie -> movie.rank }
+            key = { movie -> movie.id }
         ) { movie ->
             MovieItem(movie)
         }
@@ -189,7 +189,7 @@ private fun MovieItem(movie: Movie) {
         )
         MovieInfo(
             salesShareRate = movie.salesShareRate,
-            totalAudience = movie.totalAudience,
+            accumulatedAudience = movie.accumulatedAudience,
             width = POSTER_WIDTH.dp
         )
     }
@@ -216,11 +216,11 @@ private fun MovieTitle(
 @Composable
 private fun MovieInfo(
     salesShareRate: String,
-    totalAudience: String,
+    accumulatedAudience: String,
     width: Dp
 ) {
     Text(
-        text = stringResource(R.string.movie_info, salesShareRate, formatAudience(totalAudience)),
+        text = stringResource(R.string.movie_info, salesShareRate, formatAudience(accumulatedAudience)),
         fontSize = 14.sp,
         textAlign = TextAlign.Center,
         color = Color.Gray,
@@ -329,7 +329,7 @@ private fun MovieItemPreview() {
             id = "1",
             name = "어쩔수가없다",
             salesShareRate = "45.3",
-            totalAudience = "833401",
+            accumulatedAudience = "833401",
             posterUrl = "https://image.tmdb.org/t/p/w500/pf7vZxoLYtLQ366VNlGrjBxwL7A.jpg"
         )
     )

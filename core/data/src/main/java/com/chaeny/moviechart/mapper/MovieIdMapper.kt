@@ -18,7 +18,7 @@ class MovieIdMapper @Inject constructor() {
         "20233039" to "1151766"   // 살인자 리포트
     )
 
-    fun getTmdbId(kobisMovieId: String): String {
-        return kobisToTmdbMap[kobisMovieId] ?: ""
+    fun getTmdbId(movieId: String): String {
+        return kobisToTmdbMap[movieId] ?: ""
     }
 }
