@@ -1,4 +1,4 @@
-package com.chaeny.moviechart.dto
+package com.chaeny.moviechart
 
 data class KobisMovie(
     val rank: String,

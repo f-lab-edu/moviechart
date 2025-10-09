@@ -2,7 +2,6 @@ package com.chaeny.moviechart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.chaeny.moviechart.dto.KobisMovie
 import com.chaeny.moviechart.mapper.MovieIdMapper
 import com.chaeny.moviechart.repository.KobisRepository
 import com.chaeny.moviechart.repository.TmdbRepository
@@ -44,7 +43,7 @@ internal class MainViewModel @Inject constructor(
         _movies.value = emptyList()
         _isLoading.value = true
         viewModelScope.launch {
-            val kobisMovies = kobisRepository.getMovies(_selectedTab.value)
+            val kobisMovies = kobisRepository.getBoxOfficeList(_selectedTab.value)
             val moviesWithPosters = loadMoviePosters(kobisMovies)
             _movies.value = moviesWithPosters
             _isLoading.value = false

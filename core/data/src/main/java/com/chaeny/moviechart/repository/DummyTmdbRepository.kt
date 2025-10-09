@@ -21,7 +21,7 @@ class DummyTmdbRepository @Inject constructor() : TmdbRepository {
 
     override suspend fun getPosterUrl(movieId: String): String {
         delay(1000)
-        val posterPath = dummyPosterPaths[movieId] ?: ""
+        val posterPath = dummyPosterPaths[movieId].orEmpty()
         return "$TMDB_IMAGE_BASE_URL$posterPath"
     }
 
