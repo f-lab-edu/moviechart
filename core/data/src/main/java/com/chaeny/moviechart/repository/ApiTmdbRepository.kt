@@ -9,7 +9,7 @@ class ApiTmdbRepository @Inject constructor(
 
     override suspend fun getPosterUrl(movieId: String): String {
         val response = tmdbApiService.getMovieDetails(movieId = movieId)
-        return response.poster_path.orEmpty().toPosterUrl()
+        return response.poster_path.toPosterUrl()
     }
 
     private fun String.toPosterUrl(): String {

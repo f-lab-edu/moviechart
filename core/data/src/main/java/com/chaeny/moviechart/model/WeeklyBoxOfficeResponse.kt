@@ -4,10 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class WeeklyBoxOfficeResponse(
-    val boxOfficeResult: WeeklyBoxOfficeResult?
+    val boxOfficeResult: WeeklyBoxOfficeResult = WeeklyBoxOfficeResult()
 )
 
 @Serializable
 data class WeeklyBoxOfficeResult(
-    val weeklyBoxOfficeList: List<BoxOfficeItem>?
+    val weeklyBoxOfficeList: List<BoxOfficeItem> = emptyList()
 )

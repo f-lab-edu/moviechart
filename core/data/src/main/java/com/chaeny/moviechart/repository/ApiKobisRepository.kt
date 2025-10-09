@@ -1,6 +1,6 @@
 package com.chaeny.moviechart.repository
 
-import com.chaeny.moviechart.BoxOffice
+import com.chaeny.moviechart.Movie
 import com.chaeny.moviechart.TabType
 import com.chaeny.moviechart.model.BoxOfficeItem
 import com.chaeny.moviechart.network.KobisApiService
@@ -10,27 +10,27 @@ class ApiKobisRepository @Inject constructor(
     private val kobisApiService: KobisApiService
 ) : KobisRepository {
 
-    override suspend fun getBoxOfficeList(tabType: TabType): List<BoxOffice> {
+    override suspend fun getMovies(tabType: TabType): List<Movie> {
         val targetDate = "20250927"
 
         return when (tabType) {
             TabType.DAILY -> kobisApiService.getDailyBoxOffice(targetDate = targetDate)
-                .boxOfficeResult?.dailyBoxOfficeList
-                ?.map { it.toBoxOffice() }.orEmpty()
+                .boxOfficeResult.dailyBoxOfficeList
+                .map { it.toMovie() }
 
             TabType.WEEKLY -> kobisApiService.getWeeklyBoxOffice(targetDate = targetDate)
-                .boxOfficeResult?.weeklyBoxOfficeList
-                ?.map { it.toBoxOffice() }.orEmpty()
+                .boxOfficeResult.weeklyBoxOfficeList
+                .map { it.toMovie() }
         }
     }
 
-    private fun BoxOfficeItem.toBoxOffice(): BoxOffice {
-        return BoxOffice(
-            rank = rank.orEmpty(),
-            id = movieCd.orEmpty(),
-            name = movieNm.orEmpty(),
-            salesShareRate = salesShare.orEmpty(),
-            accumulatedAudience = audiAcc.orEmpty()
+    private fun BoxOfficeItem.toMovie(): Movie {
+        return Movie(
+            rank = rank,
+            id = movieCd,
+            name = movieNm,
+            salesShareRate = salesShare,
+            accumulatedAudience = audiAcc
         )
     }
 }
