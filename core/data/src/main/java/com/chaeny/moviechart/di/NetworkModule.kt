@@ -12,7 +12,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
-import javax.inject.Named
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
@@ -38,7 +38,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    @Named("kobis")
+    @KobisRetrofit
     fun provideKobisRetrofit(okHttpClient: OkHttpClient, json: Json): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://kobis.or.kr/kobisopenapi/webservice/rest/")
@@ -49,7 +49,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    @Named("tmdb")
+    @TmdbRetrofit
     fun provideTmdbRetrofit(okHttpClient: OkHttpClient, json: Json): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://api.themoviedb.org/3/")
@@ -60,13 +60,21 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideKobisApiService(@Named("kobis") retrofit: Retrofit): KobisApiService {
+    fun provideKobisApiService(@KobisRetrofit retrofit: Retrofit): KobisApiService {
         return retrofit.create(KobisApiService::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideTmdbApiService(@Named("tmdb") retrofit: Retrofit): TmdbApiService {
+    fun provideTmdbApiService(@TmdbRetrofit retrofit: Retrofit): TmdbApiService {
         return retrofit.create(TmdbApiService::class.java)
     }
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class KobisRetrofit
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class TmdbRetrofit
 }
