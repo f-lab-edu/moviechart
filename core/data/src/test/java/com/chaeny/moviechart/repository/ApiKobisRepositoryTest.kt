@@ -5,9 +5,7 @@ import com.chaeny.moviechart.TabType
 import com.chaeny.moviechart.model.BoxOfficeItem
 import com.chaeny.moviechart.model.DailyBoxOfficeResponse
 import com.chaeny.moviechart.model.DailyBoxOfficeResult
-import com.chaeny.moviechart.network.KobisApiService
-import io.mockk.coEvery
-import io.mockk.mockk
+import com.chaeny.moviechart.network.FakeKobisApiService
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -15,12 +13,12 @@ import org.junit.Test
 
 class ApiKobisRepositoryTest {
 
-    private lateinit var kobisApiService: KobisApiService
+    private lateinit var kobisApiService: FakeKobisApiService
     private lateinit var repository: ApiKobisRepository
 
     @Before
     fun setup() {
-        kobisApiService = mockk()
+        kobisApiService = FakeKobisApiService()
         repository = ApiKobisRepository(kobisApiService)
     }
 
@@ -28,7 +26,7 @@ class ApiKobisRepositoryTest {
     fun `when getMovies with DAILY type called then Success with movie list should be returned`() = runTest {
         val mockBoxOfficeItems = TEST_RESPONSE_LIST
         val mockResponse = DailyBoxOfficeResponse(DailyBoxOfficeResult(mockBoxOfficeItems))
-        coEvery { kobisApiService.getDailyBoxOffice(any(), any()) } returns mockResponse
+        kobisApiService.dailyBoxOfficeResponse = mockResponse
 
         val result = repository.getMovies(TabType.DAILY)
         val expectedResult = GetMoviesResult.Success(TEST_MOVIE_LIST)
