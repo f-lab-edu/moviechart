@@ -33,6 +33,15 @@ class ApiKobisRepositoryTest {
         assertEquals(expectedResult, result)
     }
 
+    @Test
+    fun `when API returns empty list then NoResult should be returned`() = runTest {
+        val emptyResponse = DailyBoxOfficeResponse(DailyBoxOfficeResult(emptyList()))
+        kobisApiService.dailyBoxOfficeResponse = emptyResponse
+
+        val result = repository.getMovies(TabType.DAILY)
+        assertEquals(GetMoviesResult.NoResult, result)
+    }
+
     companion object {
         private val TEST_RESPONSE_LIST = listOf(
             BoxOfficeItem(
