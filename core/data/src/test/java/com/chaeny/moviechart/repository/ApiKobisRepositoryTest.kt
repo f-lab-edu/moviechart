@@ -10,6 +10,8 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.io.IOException
+import java.net.UnknownHostException
 
 class ApiKobisRepositoryTest {
 
@@ -40,6 +42,33 @@ class ApiKobisRepositoryTest {
 
         val result = repository.getMovies(TabType.DAILY)
         assertEquals(GetMoviesResult.NoResult, result)
+    }
+
+    @Test
+    fun `when UnknownHostException occurs then NoInternet should be returned`() = runTest {
+        kobisApiService.throwException = true
+        kobisApiService.exception = UnknownHostException()
+
+        val result = repository.getMovies(TabType.DAILY)
+        assertEquals(GetMoviesResult.NoInternet, result)
+    }
+
+    @Test
+    fun `when IOException occurs then NetworkError should be returned`() = runTest {
+        kobisApiService.throwException = true
+        kobisApiService.exception = IOException()
+
+        val result = repository.getMovies(TabType.DAILY)
+        assertEquals(GetMoviesResult.NetworkError, result)
+    }
+
+    @Test
+    fun `when unexpected exception occurs then NetworkError should be returned`() = runTest {
+        kobisApiService.throwException = true
+        kobisApiService.exception = RuntimeException()
+
+        val result = repository.getMovies(TabType.DAILY)
+        assertEquals(GetMoviesResult.NetworkError, result)
     }
 
     companion object {

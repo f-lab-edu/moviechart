@@ -7,11 +7,16 @@ class FakeKobisApiService : KobisApiService {
 
     var dailyBoxOfficeResponse = DailyBoxOfficeResponse()
     var weeklyBoxOfficeResponse = WeeklyBoxOfficeResponse()
+    var throwException = false
+    lateinit var exception: Exception
 
     override suspend fun getDailyBoxOffice(
         key: String,
         targetDate: String
     ): DailyBoxOfficeResponse {
+        if (throwException) {
+            throw exception
+        }
         return dailyBoxOfficeResponse
     }
 
@@ -20,6 +25,9 @@ class FakeKobisApiService : KobisApiService {
         targetDate: String,
         weekGb: String
     ): WeeklyBoxOfficeResponse {
+        if (throwException) {
+            throw exception
+        }
         return weeklyBoxOfficeResponse
     }
 }
