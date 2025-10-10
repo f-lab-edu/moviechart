@@ -5,6 +5,8 @@ import com.chaeny.moviechart.TabType
 import com.chaeny.moviechart.model.BoxOfficeItem
 import com.chaeny.moviechart.model.DailyBoxOfficeResponse
 import com.chaeny.moviechart.model.DailyBoxOfficeResult
+import com.chaeny.moviechart.model.WeeklyBoxOfficeResponse
+import com.chaeny.moviechart.model.WeeklyBoxOfficeResult
 import com.chaeny.moviechart.network.FakeKobisApiService
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -31,6 +33,16 @@ class ApiKobisRepositoryTest {
         kobisApiService.dailyBoxOfficeResponse = mockResponse
 
         val result = repository.getMovies(TabType.DAILY)
+        val expectedResult = GetMoviesResult.Success(TEST_MOVIE_LIST)
+        assertEquals(expectedResult, result)
+    }
+
+    @Test
+    fun `when getMovies with WEEKLY type called then Success with movie list should be returned`() = runTest {
+        val mockResponse = WeeklyBoxOfficeResponse(WeeklyBoxOfficeResult(TEST_RESPONSE_LIST))
+        kobisApiService.weeklyBoxOfficeResponse = mockResponse
+
+        val result = repository.getMovies(TabType.WEEKLY)
         val expectedResult = GetMoviesResult.Success(TEST_MOVIE_LIST)
         assertEquals(expectedResult, result)
     }
