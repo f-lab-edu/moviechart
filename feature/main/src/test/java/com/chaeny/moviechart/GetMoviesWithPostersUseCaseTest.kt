@@ -26,11 +26,21 @@ class GetMoviesWithPostersUseCaseTest {
 
     @Test
     fun `when useCase called then success with posters should be returned`() = runTest {
+        val testMovieList = listOf(
+            Movie("1", "20243561", "어쩔수가없다", "45.3", "833401"),
+            Movie("2", "20256757", "극장판 체인소 맨: 레제편", "24.2", "368903")
+        )
+        val testPosterUrls = mapOf(
+            "639988" to "test1.jpg",
+            "1218925" to "test2.jpg"
+        )
+        kobisRepository.moviesResult = GetMoviesResult.Success(testMovieList)
+        tmdbRepository.posterUrls = testPosterUrls
         val result = useCase(PeriodType.DAILY)
 
         val expectedMovies = listOf(
-            Movie("1", "20243561", "어쩔수가없다", "45.3", "833401", "https://image.tmdb.org/t/p/w500/test1.jpg"),
-            Movie("2", "20256757", "극장판 체인소 맨: 레제편", "24.2", "368903", "https://image.tmdb.org/t/p/w500/test2.jpg")
+            Movie("1", "20243561", "어쩔수가없다", "45.3", "833401", "test1.jpg"),
+            Movie("2", "20256757", "극장판 체인소 맨: 레제편", "24.2", "368903", "test2.jpg")
         )
         assertEquals(GetMoviesResult.Success(expectedMovies), result)
     }
