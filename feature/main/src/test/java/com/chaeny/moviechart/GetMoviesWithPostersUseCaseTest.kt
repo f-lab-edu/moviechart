@@ -11,7 +11,7 @@ import org.junit.Test
 
 class GetMoviesWithPostersUseCaseTest {
 
-    private lateinit var useCase: GetMoviesWithPostersUseCase
+    private lateinit var useCase: DefaultGetMoviesWithPostersUseCase
     private lateinit var kobisRepository: FakeKobisRepository
     private lateinit var tmdbRepository: FakeTmdbRepository
     private lateinit var movieIdMapper: MovieIdMapper
@@ -21,7 +21,7 @@ class GetMoviesWithPostersUseCaseTest {
         kobisRepository = FakeKobisRepository()
         tmdbRepository = FakeTmdbRepository()
         movieIdMapper = MovieIdMapper()
-        useCase = GetMoviesWithPostersUseCase(kobisRepository, tmdbRepository, movieIdMapper)
+        useCase = DefaultGetMoviesWithPostersUseCase(kobisRepository, tmdbRepository, movieIdMapper)
     }
 
     @Test
