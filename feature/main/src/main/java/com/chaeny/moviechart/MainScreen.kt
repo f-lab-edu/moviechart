@@ -51,6 +51,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun MainScreen() {
@@ -58,22 +59,12 @@ fun MainScreen() {
     val movies by viewModel.movies.collectAsStateWithLifecycle()
     val selectedType by viewModel.selectedType.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-
     val snackbarHostState = remember { SnackbarHostState() }
-    val noInternetMessage = stringResource(R.string.no_internet)
-    val networkErrorMessage = stringResource(R.string.network_error)
-    val noResultMessage = stringResource(R.string.no_result)
 
-    LaunchedEffect(Unit) {
-        viewModel.loadEvent.collect { event ->
-            val message = when (event) {
-                LoadEvent.NoInternet -> noInternetMessage
-                LoadEvent.NetworkError -> networkErrorMessage
-                LoadEvent.NoResult -> noResultMessage
-            }
-            snackbarHostState.showSnackbar(message)
-        }
-    }
+    HandleSnackBarEvent(
+        loadEvent = viewModel.loadEvent,
+        snackbarHostState = snackbarHostState
+    )
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -98,6 +89,27 @@ fun MainScreen() {
                     color = Color.Black
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun HandleSnackBarEvent(
+    loadEvent: SharedFlow<LoadEvent>,
+    snackbarHostState: SnackbarHostState
+) {
+    val noInternetMessage = stringResource(R.string.no_internet)
+    val networkErrorMessage = stringResource(R.string.network_error)
+    val noResultMessage = stringResource(R.string.no_result)
+
+    LaunchedEffect(Unit) {
+        loadEvent.collect { event ->
+            val message = when (event) {
+                LoadEvent.NoInternet -> noInternetMessage
+                LoadEvent.NetworkError -> networkErrorMessage
+                LoadEvent.NoResult -> noResultMessage
+            }
+            snackbarHostState.showSnackbar(message)
         }
     }
 }
