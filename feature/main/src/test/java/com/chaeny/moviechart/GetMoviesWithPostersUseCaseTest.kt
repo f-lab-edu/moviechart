@@ -44,4 +44,42 @@ class GetMoviesWithPostersUseCaseTest {
         )
         assertEquals(GetMoviesResult.Success(expectedMovies), result)
     }
+
+    @Test
+    fun `when repository returns NoInternet then NoInternet should be returned`() = runTest {
+        kobisRepository.moviesResult = GetMoviesResult.NoInternet
+        val result = useCase(PeriodType.WEEKLY)
+
+        assertEquals(GetMoviesResult.NoInternet, result)
+    }
+
+    @Test
+    fun `when poster url not found then movie should have empty posterUrl`() = runTest {
+        val testMovieList = listOf(
+            Movie("1", "20243561", "어쩔수가없다", "45.3", "833401")
+        )
+        kobisRepository.moviesResult = GetMoviesResult.Success(testMovieList)
+        tmdbRepository.posterUrls = emptyMap()
+
+        val result = useCase(PeriodType.DAILY)
+        val expectedMovies = listOf(
+            Movie("1", "20243561", "어쩔수가없다", "45.3", "833401", "")
+        )
+        assertEquals(GetMoviesResult.Success(expectedMovies), result)
+    }
+
+    @Test
+    fun `when kobis id not mapped then posterUrl should be empty`() = runTest {
+        val unmappedMovie = listOf(
+            Movie("1", "0", "unknown", "10.0", "10")
+        )
+        kobisRepository.moviesResult = GetMoviesResult.Success(unmappedMovie)
+        tmdbRepository.posterUrls = emptyMap()
+
+        val result = useCase(PeriodType.WEEKLY)
+        val expectedMovies = listOf(
+            Movie("1", "0", "unknown", "10.0", "10", "")
+        )
+        assertEquals(GetMoviesResult.Success(expectedMovies), result)
+    }
 }
