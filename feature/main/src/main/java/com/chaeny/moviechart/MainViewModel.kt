@@ -16,20 +16,20 @@ internal class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
-    private val _selectedTab = MutableStateFlow(TabType.DAILY)
+    private val _selectedType = MutableStateFlow(PeriodType.DAILY)
     private val _isLoading = MutableStateFlow(false)
 
     val movies: StateFlow<List<Movie>> = _movies
-    val selectedTab: StateFlow<TabType> = _selectedTab
+    val selectedType: StateFlow<PeriodType> = _selectedType
     val isLoading: StateFlow<Boolean> = _isLoading
 
     init {
         loadMovies()
     }
 
-    fun onTabSelected(tabType: TabType) {
-        if (_selectedTab.value == tabType) return
-        _selectedTab.value = tabType
+    fun onTypeSelected(periodType: PeriodType) {
+        if (_selectedType.value == periodType) return
+        _selectedType.value = periodType
         loadMovies()
     }
 
@@ -37,7 +37,7 @@ internal class MainViewModel @Inject constructor(
         _movies.value = emptyList()
         _isLoading.value = true
         viewModelScope.launch {
-            val result = getMoviesWithPostersUseCase(_selectedTab.value)
+            val result = getMoviesWithPostersUseCase(_selectedType.value)
             handleMoviesResult(result)
             _isLoading.value = false
         }

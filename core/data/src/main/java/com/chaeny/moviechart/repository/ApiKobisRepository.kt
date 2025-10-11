@@ -1,7 +1,7 @@
 package com.chaeny.moviechart.repository
 
 import com.chaeny.moviechart.Movie
-import com.chaeny.moviechart.TabType
+import com.chaeny.moviechart.PeriodType
 import com.chaeny.moviechart.model.BoxOfficeItem
 import com.chaeny.moviechart.network.KobisApiService
 import java.io.IOException
@@ -12,16 +12,16 @@ class ApiKobisRepository @Inject constructor(
     private val kobisApiService: KobisApiService
 ) : KobisRepository {
 
-    override suspend fun getMovies(tabType: TabType): GetMoviesResult {
+    override suspend fun getMovies(periodType: PeriodType): GetMoviesResult {
         return try {
             val targetDate = "20250927"
 
-            val movies = when (tabType) {
-                TabType.DAILY -> kobisApiService.getDailyBoxOffice(targetDate = targetDate)
+            val movies = when (periodType) {
+                PeriodType.DAILY -> kobisApiService.getDailyBoxOffice(targetDate = targetDate)
                     .boxOfficeResult.dailyBoxOfficeList
                     .map { it.toMovie() }
 
-                TabType.WEEKLY -> kobisApiService.getWeeklyBoxOffice(targetDate = targetDate)
+                PeriodType.WEEKLY -> kobisApiService.getWeeklyBoxOffice(targetDate = targetDate)
                     .boxOfficeResult.weeklyBoxOfficeList
                     .map { it.toMovie() }
             }

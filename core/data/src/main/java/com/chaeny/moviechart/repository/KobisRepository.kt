@@ -1,7 +1,7 @@
 package com.chaeny.moviechart.repository
 
-import com.chaeny.moviechart.TabType
+import com.chaeny.moviechart.PeriodType
 
 interface KobisRepository {
-    suspend fun getMovies(tabType: TabType): GetMoviesResult
+    suspend fun getMovies(periodType: PeriodType): GetMoviesResult
 }

@@ -14,8 +14,8 @@ class GetMoviesWithPostersUseCase @Inject constructor(
     private val tmdbRepository: TmdbRepository,
     private val movieIdMapper: MovieIdMapper
 ) {
-    suspend operator fun invoke(tabType: TabType): GetMoviesResult {
-        val result = kobisRepository.getMovies(tabType)
+    suspend operator fun invoke(periodType: PeriodType): GetMoviesResult {
+        val result = kobisRepository.getMovies(periodType)
         return when (result) {
             is GetMoviesResult.Success -> {
                 val moviesWithPosters = loadMoviePosters(result.movies)
