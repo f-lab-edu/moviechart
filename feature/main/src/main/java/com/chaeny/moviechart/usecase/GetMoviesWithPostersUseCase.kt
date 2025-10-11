@@ -1,5 +1,6 @@
-package com.chaeny.moviechart
+package com.chaeny.moviechart.usecase
 
+import com.chaeny.moviechart.PeriodType
 import com.chaeny.moviechart.repository.GetMoviesResult
 
 interface GetMoviesWithPostersUseCase {

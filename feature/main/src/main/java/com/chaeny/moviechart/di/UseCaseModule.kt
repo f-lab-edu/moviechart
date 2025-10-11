@@ -1,7 +1,7 @@
 package com.chaeny.moviechart.di
 
-import com.chaeny.moviechart.DefaultGetMoviesWithPostersUseCase
-import com.chaeny.moviechart.GetMoviesWithPostersUseCase
+import com.chaeny.moviechart.usecase.DefaultGetMoviesWithPostersUseCase
+import com.chaeny.moviechart.usecase.GetMoviesWithPostersUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
