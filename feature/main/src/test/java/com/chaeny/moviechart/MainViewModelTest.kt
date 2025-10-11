@@ -69,4 +69,24 @@ class MainViewModelTest {
         val expectedCount = 1
         assertEquals(expectedCount, useCase.callCount)
     }
+
+    @Test
+    fun `when switching between types then movies should update correctly`() {
+        val dailyMovies = listOf(
+            Movie("1", "20243561", "어쩔수가없다", "45.3", "833401", "daily.jpg"),
+        )
+        val weeklyMovies = listOf(
+            Movie("1", "20256757", "극장판 체인소 맨: 레제편", "24.2", "368903", "weekly.jpg")
+        )
+        useCase.resultByType = mapOf(
+            PeriodType.DAILY to GetMoviesResult.Success(dailyMovies),
+            PeriodType.WEEKLY to GetMoviesResult.Success(weeklyMovies)
+        )
+
+        viewModel = MainViewModel(useCase)
+        assertEquals(dailyMovies, viewModel.movies.value)
+
+        viewModel.onTypeSelected(PeriodType.WEEKLY)
+        assertEquals(weeklyMovies, viewModel.movies.value)
+    }
 }
