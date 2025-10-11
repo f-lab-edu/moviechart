@@ -23,8 +23,12 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -55,23 +59,45 @@ fun MainScreen() {
     val selectedType by viewModel.selectedType.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Column {
-            TopBar()
-            PeriodTypes(
-                selectedType = selectedType,
-                onTypeSelected = viewModel::onTypeSelected
-            )
-            MovieList(movies)
-        }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val noInternetMessage = stringResource(R.string.no_internet)
+    val networkErrorMessage = stringResource(R.string.network_error)
+    val noResultMessage = stringResource(R.string.no_result)
 
-        if (isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center),
-                color = Color.Black
-            )
+    LaunchedEffect(Unit) {
+        viewModel.loadEvent.collect { event ->
+            val message = when (event) {
+                LoadEvent.NoInternet -> noInternetMessage
+                LoadEvent.NetworkError -> networkErrorMessage
+                LoadEvent.NoResult -> noResultMessage
+            }
+            snackbarHostState.showSnackbar(message)
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            Column {
+                TopBar()
+                PeriodTypes(
+                    selectedType = selectedType,
+                    onTypeSelected = viewModel::onTypeSelected
+                )
+                MovieList(movies)
+            }
+
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = Color.Black
+                )
+            }
         }
     }
 }
