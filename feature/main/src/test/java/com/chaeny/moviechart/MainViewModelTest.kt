@@ -60,4 +60,13 @@ class MainViewModelTest {
 
         assertEquals(emptyList<Movie>(), viewModel.movies.value)
     }
+
+    @Test
+    fun `when same type is selected again then useCase should not be called`() {
+        viewModel = MainViewModel(useCase)
+        viewModel.onTypeSelected(PeriodType.DAILY)
+
+        val expectedCount = 1
+        assertEquals(expectedCount, useCase.callCount)
+    }
 }
