@@ -1,6 +1,6 @@
 package com.chaeny.moviechart
 
-enum class TabType {
+enum class PeriodType {
     DAILY,
     WEEKLY
 }

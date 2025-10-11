@@ -1,7 +1,7 @@
 package com.chaeny.moviechart.repository
 
 import com.chaeny.moviechart.Movie
-import com.chaeny.moviechart.TabType
+import com.chaeny.moviechart.PeriodType
 import com.chaeny.moviechart.model.BoxOfficeItem
 import com.chaeny.moviechart.model.DailyBoxOfficeResponse
 import com.chaeny.moviechart.model.DailyBoxOfficeResult
@@ -32,7 +32,7 @@ class ApiKobisRepositoryTest {
         val mockResponse = DailyBoxOfficeResponse(DailyBoxOfficeResult(mockBoxOfficeItems))
         kobisApiService.dailyBoxOfficeResponse = mockResponse
 
-        val result = repository.getMovies(TabType.DAILY)
+        val result = repository.getMovies(PeriodType.DAILY)
         val expectedResult = GetMoviesResult.Success(TEST_MOVIE_LIST)
         assertEquals(expectedResult, result)
     }
@@ -42,7 +42,7 @@ class ApiKobisRepositoryTest {
         val mockResponse = WeeklyBoxOfficeResponse(WeeklyBoxOfficeResult(TEST_RESPONSE_LIST))
         kobisApiService.weeklyBoxOfficeResponse = mockResponse
 
-        val result = repository.getMovies(TabType.WEEKLY)
+        val result = repository.getMovies(PeriodType.WEEKLY)
         val expectedResult = GetMoviesResult.Success(TEST_MOVIE_LIST)
         assertEquals(expectedResult, result)
     }
@@ -52,7 +52,7 @@ class ApiKobisRepositoryTest {
         val emptyResponse = DailyBoxOfficeResponse(DailyBoxOfficeResult(emptyList()))
         kobisApiService.dailyBoxOfficeResponse = emptyResponse
 
-        val result = repository.getMovies(TabType.DAILY)
+        val result = repository.getMovies(PeriodType.DAILY)
         assertEquals(GetMoviesResult.NoResult, result)
     }
 
@@ -61,7 +61,7 @@ class ApiKobisRepositoryTest {
         kobisApiService.throwException = true
         kobisApiService.exception = UnknownHostException()
 
-        val result = repository.getMovies(TabType.DAILY)
+        val result = repository.getMovies(PeriodType.DAILY)
         assertEquals(GetMoviesResult.NoInternet, result)
     }
 
@@ -70,7 +70,7 @@ class ApiKobisRepositoryTest {
         kobisApiService.throwException = true
         kobisApiService.exception = IOException()
 
-        val result = repository.getMovies(TabType.DAILY)
+        val result = repository.getMovies(PeriodType.DAILY)
         assertEquals(GetMoviesResult.NetworkError, result)
     }
 
@@ -79,7 +79,7 @@ class ApiKobisRepositoryTest {
         kobisApiService.throwException = true
         kobisApiService.exception = RuntimeException()
 
-        val result = repository.getMovies(TabType.DAILY)
+        val result = repository.getMovies(PeriodType.DAILY)
         assertEquals(GetMoviesResult.NetworkError, result)
     }
 

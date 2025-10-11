@@ -1,7 +1,7 @@
 package com.chaeny.moviechart.repository
 
 import com.chaeny.moviechart.Movie
-import com.chaeny.moviechart.TabType
+import com.chaeny.moviechart.PeriodType
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 
@@ -33,11 +33,11 @@ class DummyKobisRepository @Inject constructor() : KobisRepository {
         Movie("10", "20233039", "살인자 리포트", "0.5", "364379")
     )
 
-    override suspend fun getMovies(tabType: TabType): GetMoviesResult {
+    override suspend fun getMovies(periodType: PeriodType): GetMoviesResult {
         delay(2000)
-        val movies = when (tabType) {
-            TabType.DAILY -> dailyData
-            TabType.WEEKLY -> weeklyData
+        val movies = when (periodType) {
+            PeriodType.DAILY -> dailyData
+            PeriodType.WEEKLY -> weeklyData
         }
         return GetMoviesResult.Success(movies)
     }

@@ -3,14 +3,9 @@ package com.chaeny.moviechart
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.chaeny.moviechart.mapper.MovieIdMapper
 import com.chaeny.moviechart.repository.GetMoviesResult
-import com.chaeny.moviechart.repository.KobisRepository
-import com.chaeny.moviechart.repository.TmdbRepository
+import com.chaeny.moviechart.usecase.GetMoviesWithPostersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -18,26 +13,24 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class MainViewModel @Inject constructor(
-    private val kobisRepository: KobisRepository,
-    private val tmdbRepository: TmdbRepository,
-    private val movieIdMapper: MovieIdMapper
+    private val getMoviesWithPostersUseCase: GetMoviesWithPostersUseCase
 ) : ViewModel() {
 
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
-    private val _selectedTab = MutableStateFlow(TabType.DAILY)
+    private val _selectedType = MutableStateFlow(PeriodType.DAILY)
     private val _isLoading = MutableStateFlow(false)
 
     val movies: StateFlow<List<Movie>> = _movies
-    val selectedTab: StateFlow<TabType> = _selectedTab
+    val selectedType: StateFlow<PeriodType> = _selectedType
     val isLoading: StateFlow<Boolean> = _isLoading
 
     init {
         loadMovies()
     }
 
-    fun onTabSelected(tabType: TabType) {
-        if (_selectedTab.value == tabType) return
-        _selectedTab.value = tabType
+    fun onTypeSelected(periodType: PeriodType) {
+        if (_selectedType.value == periodType) return
+        _selectedType.value = periodType
         loadMovies()
     }
 
@@ -45,16 +38,16 @@ internal class MainViewModel @Inject constructor(
         _movies.value = emptyList()
         _isLoading.value = true
         viewModelScope.launch {
-            val result = kobisRepository.getMovies(_selectedTab.value)
+            val result = getMoviesWithPostersUseCase(_selectedType.value)
             handleMoviesResult(result)
             _isLoading.value = false
         }
     }
 
-    private suspend fun handleMoviesResult(result: GetMoviesResult) {
+    private fun handleMoviesResult(result: GetMoviesResult) {
         when (result) {
             is GetMoviesResult.Success -> {
-                val moviesWithPosters = loadMoviePosters(result.movies)
+                val moviesWithPosters = result.movies
                 _movies.value = moviesWithPosters
             }
             is GetMoviesResult.NoResult -> {
@@ -69,18 +62,6 @@ internal class MainViewModel @Inject constructor(
                 Log.e("MainViewModel", "NetworkError")
                 _movies.value = emptyList()
             }
-        }
-    }
-
-    private suspend fun loadMoviePosters(movies: List<Movie>): List<Movie> {
-        return coroutineScope {
-            movies.map { movie ->
-                async {
-                    val tmdbId = movieIdMapper.getTmdbId(movie.id)
-                    val posterUrl = tmdbRepository.getPosterUrl(tmdbId)
-                    movie.copy(posterUrl = posterUrl)
-                }
-            }.awaitAll()
         }
     }
 }

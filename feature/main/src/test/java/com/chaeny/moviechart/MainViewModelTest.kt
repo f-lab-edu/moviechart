@@ -1,20 +1,13 @@
 package com.chaeny.moviechart
 
-import com.chaeny.moviechart.mapper.MovieIdMapper
 import com.chaeny.moviechart.repository.GetMoviesResult
-import com.chaeny.moviechart.repository.KobisRepository
-import com.chaeny.moviechart.repository.TmdbRepository
+import com.chaeny.moviechart.usecase.FakeGetMoviesWithPostersUseCase
 import com.chaeny.moviechart.util.MainCoroutineScopeRule
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.mockk
-import io.mockk.spyk
-import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -28,57 +21,32 @@ class MainViewModelTest {
     val coroutineRule = MainCoroutineScopeRule()
 
     private lateinit var viewModel: MainViewModel
-    private lateinit var kobisRepository: KobisRepository
-    private lateinit var tmdbRepository: TmdbRepository
-    private lateinit var movieIdMapper: MovieIdMapper
+    private lateinit var useCase: FakeGetMoviesWithPostersUseCase
 
     @Before
     fun setup() {
-        kobisRepository = mockk()
-        tmdbRepository = mockk()
-        movieIdMapper = spyk(MovieIdMapper())
-    }
-
-    private fun createViewModel(
-        movieList: List<Movie>,
-        posterUrls: Map<String, String>
-    ): MainViewModel {
-        stubKobisRepository(movieList)
-        stubTmdbRepository(posterUrls)
-        return MainViewModel(kobisRepository, tmdbRepository, movieIdMapper)
-    }
-
-    private fun stubKobisRepository(movieList: List<Movie>) {
-        coEvery { kobisRepository.getMovies(any()) } returns GetMoviesResult.Success(movieList)
-    }
-
-    private fun stubTmdbRepository(posterUrls: Map<String, String>) {
-        posterUrls.forEach { (movieId, url) ->
-            coEvery { tmdbRepository.getPosterUrl(movieId) } returns url
-        }
+        useCase = FakeGetMoviesWithPostersUseCase()
     }
 
     @Test
-    fun `when viewModel created then selectedTab should be DAILY and repository called with DAILY`() {
-        viewModel = createViewModel(TEST_MOVIE_LIST, TEST_POSTER_URLS)
+    fun `when viewModel created then selectedType should be DAILY`() {
+        viewModel = MainViewModel(useCase)
 
-        assertEquals(TabType.DAILY, viewModel.selectedTab.value)
-        coVerify { kobisRepository.getMovies(TabType.DAILY) }
+        assertEquals(PeriodType.DAILY, viewModel.selectedType.value)
     }
 
     @Test
-    fun `when data loading completes then isLoading should be false`() {
-        viewModel = createViewModel(TEST_MOVIE_LIST, TEST_POSTER_URLS)
+    fun `when onTypeSelected WEEKLY then selectedType should be WEEKLY`() {
+        viewModel = MainViewModel(useCase)
+        viewModel.onTypeSelected(PeriodType.WEEKLY)
 
-        coVerify { kobisRepository.getMovies(any()) }
-        coVerify { tmdbRepository.getPosterUrl(any()) }
-        assertEquals(false, viewModel.isLoading.value)
+        assertEquals(PeriodType.WEEKLY, viewModel.selectedType.value)
     }
 
     @Test
-    fun `when movies are loading then isLoading should be true and false after completion`() = runTest {
+    fun `when loading movies then isLoading should be true and false after completion`() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
-        viewModel = createViewModel(TEST_MOVIE_LIST, TEST_POSTER_URLS)
+        viewModel = MainViewModel(useCase)
 
         assertEquals(true, viewModel.isLoading.value)
         advanceUntilIdle()
@@ -86,130 +54,39 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `when onTabSelected WEEKLY then selectedTab should be WEEKLY and repository called`() {
-        viewModel = createViewModel(TEST_MOVIE_LIST, TEST_POSTER_URLS)
-        viewModel.onTabSelected(TabType.WEEKLY)
-
-        assertEquals(TabType.WEEKLY, viewModel.selectedTab.value)
-        coVerify { kobisRepository.getMovies(TabType.WEEKLY) }
-    }
-
-    @Test
-    fun `when movie and posterUrl are combined then Movie should be returned correctly`() {
-        val testMovieList = listOf(
-            Movie("1", "20243561", "어쩔수가없다", "45.3", "833401"),
-            Movie("2", "20256757", "극장판 체인소 맨: 레제편", "24.2", "368903")
-        )
-        val testPosterUrls = mapOf(
-            "639988" to "test1.jpg",
-            "1218925" to "test2.jpg"
-        )
-        stubKobisRepository(testMovieList)
-        stubTmdbRepository(testPosterUrls)
-        val viewModel = MainViewModel(kobisRepository, tmdbRepository, movieIdMapper)
-
-        verify(exactly = 2) { movieIdMapper.getTmdbId(any()) }
-        coVerify(exactly = 2) { tmdbRepository.getPosterUrl(any()) }
-        val expectedMovies = listOf(
-            Movie("1", "20243561", "어쩔수가없다", "45.3", "833401", "test1.jpg"),
-            Movie("2", "20256757", "극장판 체인소 맨: 레제편", "24.2", "368903", "test2.jpg")
-        )
-        assertEquals(expectedMovies, viewModel.movies.value)
-    }
-
-    @Test
-    fun `when getTmdbId called with kobis id then correct tmdb id should be returned`() {
-        assertEquals("639988", movieIdMapper.getTmdbId("20243561"))
-        assertEquals("1218925", movieIdMapper.getTmdbId("20256757"))
-        verify(exactly = 2) { movieIdMapper.getTmdbId(any()) }
-    }
-
-    @Test
-    fun `when repository returns empty list then movies should be empty`() {
-        viewModel = createViewModel(emptyList(), emptyMap())
+    fun `when useCase returns NoResult then movies should be empty`() {
+        useCase.result = GetMoviesResult.NoResult
+        viewModel = MainViewModel(useCase)
 
         assertEquals(emptyList<Movie>(), viewModel.movies.value)
-        coVerify(exactly = 1) { kobisRepository.getMovies(any()) }
-        coVerify(exactly = 0) { tmdbRepository.getPosterUrl(any()) }
     }
 
     @Test
-    fun `when posterUrl is not available then movie should have empty posterUrl`() {
-        val testMovie = listOf(Movie("1", "20243561", "어쩔수가없다", "45.3", "833401"))
-        stubKobisRepository(testMovie)
-        coEvery { tmdbRepository.getPosterUrl(any()) } returns ""
-        viewModel = MainViewModel(kobisRepository, tmdbRepository, movieIdMapper)
+    fun `when same type is selected again then useCase should not be called`() {
+        viewModel = MainViewModel(useCase)
+        viewModel.onTypeSelected(PeriodType.DAILY)
 
-        val expectedMovie = listOf(Movie("1", "20243561", "어쩔수가없다", "45.3", "833401", ""))
-        assertEquals(expectedMovie, viewModel.movies.value)
+        val expectedCount = 1
+        assertEquals(expectedCount, useCase.callCount)
     }
 
     @Test
-    fun `when kobis id is not mapped then tmdb id should be empty`() {
-        val unmappedMovie = listOf(Movie("1", "0", "unknown", "10.0", "10"))
-        stubKobisRepository(unmappedMovie)
-        coEvery { tmdbRepository.getPosterUrl("") } returns ""
-        viewModel = MainViewModel(kobisRepository, tmdbRepository, movieIdMapper)
-
-        assertEquals("", movieIdMapper.getTmdbId("0"))
-        val expectedMovie = listOf(Movie("1", "0", "unknown", "10.0", "10", ""))
-        assertEquals(expectedMovie, viewModel.movies.value)
-    }
-
-    @Test
-    fun `when switching between tabs then movies should update correctly`() {
-        val dailyMovies = listOf(Movie("1", "20243561", "어쩔수가없다", "45.3", "833401"))
-        val dailyPosterUrls = mapOf("639988" to "daily.jpg")
-        val weeklyMovies = listOf(Movie("1", "20242964", "얼굴", "30.0", "500000"))
-        val weeklyPosterUrls = mapOf("1316719" to "weekly.jpg")
-
-        coEvery { kobisRepository.getMovies(TabType.DAILY) } returns GetMoviesResult.Success(dailyMovies)
-        stubTmdbRepository(dailyPosterUrls)
-        viewModel = MainViewModel(kobisRepository, tmdbRepository, movieIdMapper)
-
-        val expectedDailyMovie = listOf(Movie("1", "20243561", "어쩔수가없다", "45.3", "833401", "daily.jpg"))
-        assertEquals(expectedDailyMovie, viewModel.movies.value)
-
-        coEvery { kobisRepository.getMovies(TabType.WEEKLY) } returns GetMoviesResult.Success(weeklyMovies)
-        stubTmdbRepository(weeklyPosterUrls)
-        viewModel.onTabSelected(TabType.WEEKLY)
-        val expectedWeeklyMovie = listOf(Movie("1", "20242964", "얼굴", "30.0", "500000", "weekly.jpg"))
-        assertEquals(expectedWeeklyMovie, viewModel.movies.value)
-
-        viewModel.onTabSelected(TabType.DAILY)
-        assertEquals(expectedDailyMovie, viewModel.movies.value)
-    }
-
-    @Test
-    fun `when same tab is selected again then repository should not be called`() {
-        viewModel = createViewModel(TEST_MOVIE_LIST, TEST_POSTER_URLS)
-
-        viewModel.onTabSelected(TabType.DAILY)
-
-        coVerify(exactly = 1) { kobisRepository.getMovies(TabType.DAILY) }
-    }
-
-    companion object {
-        private val TEST_MOVIE_LIST = listOf(
-            Movie(
-                rank = "1",
-                id = "20243561",
-                name = "어쩔수가없다",
-                salesShareRate = "45.3",
-                accumulatedAudience = "833401"
-            ),
-            Movie(
-                rank = "2",
-                id = "20256757",
-                name = "극장판 체인소 맨: 레제편",
-                salesShareRate = "24.2",
-                accumulatedAudience = "368903"
-            )
+    fun `when switching between types then movies should update correctly`() {
+        val dailyMovies = listOf(
+            Movie("1", "20243561", "어쩔수가없다", "45.3", "833401", "daily.jpg"),
         )
-        private val TEST_POSTER_URLS = mapOf(
-            "639988" to "https://image.tmdb.org/t/p/w500/test1.jpg",
-            "1218925" to "https://image.tmdb.org/t/p/w500/test2.jpg"
+        val weeklyMovies = listOf(
+            Movie("1", "20256757", "극장판 체인소 맨: 레제편", "24.2", "368903", "weekly.jpg")
         )
-    }
+        useCase.resultByType = mapOf(
+            PeriodType.DAILY to GetMoviesResult.Success(dailyMovies),
+            PeriodType.WEEKLY to GetMoviesResult.Success(weeklyMovies)
+        )
 
+        viewModel = MainViewModel(useCase)
+        assertEquals(dailyMovies, viewModel.movies.value)
+
+        viewModel.onTypeSelected(PeriodType.WEEKLY)
+        assertEquals(weeklyMovies, viewModel.movies.value)
+    }
 }

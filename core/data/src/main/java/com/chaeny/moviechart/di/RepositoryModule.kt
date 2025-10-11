@@ -16,9 +16,9 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindKobisRepository(dummyKobisRepository: ApiKobisRepository): KobisRepository
+    abstract fun bindKobisRepository(implementation: ApiKobisRepository): KobisRepository
 
     @Binds
     @Singleton
-    abstract fun bindTmdbRepository(dummyTmdbRepository: ApiTmdbRepository): TmdbRepository
+    abstract fun bindTmdbRepository(implementation: ApiTmdbRepository): TmdbRepository
 }

@@ -52,7 +52,7 @@ import coil.request.ImageRequest
 fun MainScreen() {
     val viewModel: MainViewModel = hiltViewModel()
     val movies by viewModel.movies.collectAsStateWithLifecycle()
-    val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
+    val selectedType by viewModel.selectedType.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     Box(
@@ -60,9 +60,9 @@ fun MainScreen() {
     ) {
         Column {
             TopBar()
-            PeriodTabs(
-                selectedTab = selectedTab,
-                onTabSelected = viewModel::onTabSelected
+            PeriodTypes(
+                selectedType = selectedType,
+                onTypeSelected = viewModel::onTypeSelected
             )
             MovieList(movies)
         }
@@ -100,9 +100,9 @@ private fun TopBar() {
 }
 
 @Composable
-private fun PeriodTabs(
-    selectedTab: TabType,
-    onTabSelected: (TabType) -> Unit
+private fun PeriodTypes(
+    selectedType: PeriodType,
+    onTypeSelected: (PeriodType) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -110,19 +110,19 @@ private fun PeriodTabs(
             .padding(horizontal = 25.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        TabType.entries.forEach { tab ->
-            TabItem(
-                tabType = tab,
-                isSelected = selectedTab == tab,
-                onClick = { onTabSelected(tab) }
+        PeriodType.entries.forEach { type ->
+            TypeItem(
+                periodType = type,
+                isSelected = selectedType == type,
+                onClick = { onTypeSelected(type) }
             )
         }
     }
 }
 
 @Composable
-private fun TabItem(
-    tabType: TabType,
+private fun TypeItem(
+    periodType: PeriodType,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -136,9 +136,9 @@ private fun TabItem(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = when (tabType) {
-                TabType.DAILY -> stringResource(R.string.daily)
-                TabType.WEEKLY -> stringResource(R.string.weekly)
+            text = when (periodType) {
+                PeriodType.DAILY -> stringResource(R.string.daily)
+                PeriodType.WEEKLY -> stringResource(R.string.weekly)
             },
             fontSize = 16.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
@@ -303,18 +303,18 @@ private fun TopBarPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun PeriodTabsPreview() {
-    PeriodTabs(
-        selectedTab = TabType.WEEKLY,
-        onTabSelected = {}
+private fun PeriodTypesPreview() {
+    PeriodTypes(
+        selectedType = PeriodType.WEEKLY,
+        onTypeSelected = {}
     )
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun TabItemPreview() {
-    TabItem(
-        tabType = TabType.DAILY,
+private fun TypeItemPreview() {
+    TypeItem(
+        periodType = PeriodType.DAILY,
         isSelected = true,
         onClick = {}
     )
