@@ -275,7 +275,7 @@ private fun MovieTitle(
 }
 
 @Composable
-private fun MovieInfo(
+internal fun MovieInfo(
     salesShareRate: String,
     accumulatedAudience: String,
     width: Dp
