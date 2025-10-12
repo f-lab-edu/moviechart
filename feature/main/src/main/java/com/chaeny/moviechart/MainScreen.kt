@@ -119,7 +119,7 @@ private fun HandleSnackBarEvent(
 }
 
 @Composable
-private fun TopBar() {
+internal fun TopBar() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
