@@ -15,16 +15,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -32,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -43,10 +49,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.coroutines.flow.SharedFlow
+import kotlin.math.absoluteValue
 
 @Composable
 fun MainScreen() {
@@ -54,30 +63,63 @@ fun MainScreen() {
     val movies by viewModel.movies.collectAsStateWithLifecycle()
     val selectedType by viewModel.selectedType.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Column {
-            TopBar()
-            PeriodTypes(
-                selectedType = selectedType,
-                onTypeSelected = viewModel::onTypeSelected
-            )
-            MovieList(movies)
-        }
+    HandleSnackBarEvent(
+        loadEvent = viewModel.loadEvent,
+        snackbarHostState = snackbarHostState
+    )
 
-        if (isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center),
-                color = Color.Black
-            )
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            Column {
+                TopBar()
+                PeriodTypes(
+                    selectedType = selectedType,
+                    onTypeSelected = viewModel::onTypeSelected
+                )
+                MovieList(movies)
+            }
+
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = Color.Black
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun TopBar() {
+private fun HandleSnackBarEvent(
+    loadEvent: SharedFlow<LoadEvent>,
+    snackbarHostState: SnackbarHostState
+) {
+    val noInternetMessage = stringResource(R.string.no_internet)
+    val networkErrorMessage = stringResource(R.string.network_error)
+    val noResultMessage = stringResource(R.string.no_result)
+
+    LaunchedEffect(Unit) {
+        loadEvent.collect { event ->
+            val message = when (event) {
+                LoadEvent.NoInternet -> noInternetMessage
+                LoadEvent.NetworkError -> networkErrorMessage
+                LoadEvent.NoResult -> noResultMessage
+            }
+            snackbarHostState.showSnackbar(message)
+        }
+    }
+}
+
+@Composable
+internal fun TopBar() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -100,7 +142,7 @@ private fun TopBar() {
 }
 
 @Composable
-private fun PeriodTypes(
+internal fun PeriodTypes(
     selectedType: PeriodType,
     onTypeSelected: (PeriodType) -> Unit
 ) {
@@ -155,25 +197,44 @@ private fun TypeItem(
 
 @Composable
 private fun MovieList(movies: List<Movie>) {
-    LazyRow(
+    val pagerState = rememberPagerState(pageCount = { movies.size })
+
+    HorizontalPager(
+        state = pagerState,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 20.dp),
-        horizontalArrangement = Arrangement.spacedBy(30.dp),
         contentPadding = PaddingValues(horizontal = 50.dp)
-    ) {
-        items(
-            items = movies,
-            key = { movie -> movie.id }
-        ) { movie ->
-            MovieItem(movie)
-        }
+    ) { page ->
+        MovieItem(
+            movie = movies[page],
+            pagerState = pagerState,
+            page = page
+        )
     }
 }
 
 @Composable
-private fun MovieItem(movie: Movie) {
-    Column {
+private fun MovieItem(
+    movie: Movie,
+    pagerState: PagerState,
+    page: Int
+) {
+    Column(
+        modifier = Modifier
+            .graphicsLayer {
+                val pageOffset = (
+                    (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+                    ).absoluteValue
+
+                scaleX = lerp(
+                    start = 1.0f,
+                    stop = 0.8f,
+                    fraction = pageOffset.coerceIn(0f, 1f)
+                )
+                scaleY = scaleX
+            }
+    ) {
         Box(
             modifier = Modifier
                 .width(POSTER_WIDTH.dp)
@@ -214,7 +275,7 @@ private fun MovieTitle(
 }
 
 @Composable
-private fun MovieInfo(
+internal fun MovieInfo(
     salesShareRate: String,
     accumulatedAudience: String,
     width: Dp
@@ -323,6 +384,8 @@ private fun TypeItemPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun MovieItemPreview() {
+    val pagerState = rememberPagerState(pageCount = { 1 })
+
     MovieItem(
         movie = Movie(
             rank = "1",
@@ -331,6 +394,8 @@ private fun MovieItemPreview() {
             salesShareRate = "45.3",
             accumulatedAudience = "833401",
             posterUrl = "https://image.tmdb.org/t/p/w500/pf7vZxoLYtLQ366VNlGrjBxwL7A.jpg"
-        )
+        ),
+        pagerState = pagerState,
+        page = 0
     )
 }
