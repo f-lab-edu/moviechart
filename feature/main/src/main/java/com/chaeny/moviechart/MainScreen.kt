@@ -142,7 +142,7 @@ private fun TopBar() {
 }
 
 @Composable
-private fun PeriodTypes(
+internal fun PeriodTypes(
     selectedType: PeriodType,
     onTypeSelected: (PeriodType) -> Unit
 ) {
