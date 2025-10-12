@@ -15,10 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -38,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -49,11 +49,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.flow.SharedFlow
+import kotlin.math.absoluteValue
 
 @Composable
 fun MainScreen() {
@@ -195,30 +197,44 @@ private fun TypeItem(
 
 @Composable
 private fun MovieList(movies: List<Movie>) {
-    val listState = rememberLazyListState()
-    val flingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
+    val pagerState = rememberPagerState(pageCount = { movies.size })
 
-    LazyRow(
-        state = listState,
-        flingBehavior = flingBehavior,
+    HorizontalPager(
+        state = pagerState,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 20.dp),
-        horizontalArrangement = Arrangement.spacedBy(30.dp),
         contentPadding = PaddingValues(horizontal = 50.dp)
-    ) {
-        items(
-            items = movies,
-            key = { movie -> movie.id }
-        ) { movie ->
-            MovieItem(movie)
-        }
+    ) { page ->
+        MovieItem(
+            movie = movies[page],
+            pagerState = pagerState,
+            page = page
+        )
     }
 }
 
 @Composable
-private fun MovieItem(movie: Movie) {
-    Column {
+private fun MovieItem(
+    movie: Movie,
+    pagerState: PagerState,
+    page: Int
+) {
+    Column(
+        modifier = Modifier
+            .graphicsLayer {
+                val pageOffset = (
+                    (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+                    ).absoluteValue
+
+                scaleX = lerp(
+                    start = 1.0f,
+                    stop = 0.8f,
+                    fraction = pageOffset.coerceIn(0f, 1f)
+                )
+                scaleY = scaleX
+            }
+    ) {
         Box(
             modifier = Modifier
                 .width(POSTER_WIDTH.dp)
@@ -368,6 +384,8 @@ private fun TypeItemPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun MovieItemPreview() {
+    val pagerState = rememberPagerState(pageCount = { 1 })
+
     MovieItem(
         movie = Movie(
             rank = "1",
@@ -376,6 +394,8 @@ private fun MovieItemPreview() {
             salesShareRate = "45.3",
             accumulatedAudience = "833401",
             posterUrl = "https://image.tmdb.org/t/p/w500/pf7vZxoLYtLQ366VNlGrjBxwL7A.jpg"
-        )
+        ),
+        pagerState = pagerState,
+        page = 0
     )
 }
